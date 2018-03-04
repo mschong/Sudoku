@@ -18,7 +18,7 @@ public class Board {
         this.size = size;
 
         initializeGrid();
-        addRandomNumbers(17);
+       // addRandomNumbers(1);
     }
 
 
