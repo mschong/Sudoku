@@ -80,6 +80,18 @@ public class BoardView extends View {
         blackPaint.setStrokeWidth(5);
     }
 
+    private final Paint preFilledPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+    {
+        preFilledPaint.setColor(Color.BLACK);
+        preFilledPaint.setTextSize(50);
+    }
+
+    private final Paint textPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+    {
+        textPaint.setColor(Color.BLUE);
+        textPaint.setTextSize(50);
+    }
+
     boolean win;
 
     /** Create a new board view to be run in the given context. */
@@ -114,7 +126,7 @@ public class BoardView extends View {
         if (board != null) {
             //If game is not won, it will display regular colored board
                 drawGrid(canvas);
-               // drawSquares(canvas);
+               drawSquares(canvas);
                 //If game is won. board will change to color green to indicate the game has been won.
             }
 
@@ -152,13 +164,15 @@ public class BoardView extends View {
         //horizontal bold line
         canvas.drawLine(0,maxCoord/2,maxCoord,maxCoord/2,blackPaint);
 
-       /* //vertical gray lines
+       //vertical gray lines
         for(int i =1; i < boardSize; i++){
             canvas.drawLine((maxCoord/boardSize)*i,0,(maxCoord/boardSize)*i,maxCoord,grayPaint);
         }
 
         //horizontal gray lines
-        */
+        for(int i = 1; i < boardSize; i++){
+            canvas.drawLine(0,(maxCoord/boardSize)*i, maxCoord,(maxCoord/boardSize)*i,grayPaint);
+        }
 
     }
 
@@ -187,13 +201,13 @@ public class BoardView extends View {
     /** Draw all the squares (numbers) of the associated board. */
    private void drawSquares(Canvas canvas) {
         //Paint for the prefilled numbers
-        Paint prefilledColor = new Paint();
+        //Paint prefilledColor = new Paint();
         //Paint for the user added numbers
-        Paint textColor = new Paint();
-        textColor.setColor(Color.BLUE);
-        textColor.setTextSize(50);
-        prefilledColor.setColor(Color.BLACK);
-        prefilledColor.setTextSize(50);
+        //Paint textColor = new Paint();
+        //textColor.setColor(Color.BLUE);
+        //textColor.setTextSize(50);
+        //prefilledColor.setColor(Color.BLACK);
+        //prefilledColor.setTextSize(50);
 
         int gridSpacing = getHeight()/ boardSize;
         int sizeOfBoard = boardSize * gridSpacing;
@@ -205,9 +219,9 @@ public class BoardView extends View {
             for(int j = 0; j<board.size; j++){
                 //Check if it's one of the prefilled values
                 if(board.getSquare(i,j).getValue() != 0 && board.getSquare(i,j).getPrefilled()==true){
-                    canvas.drawText(Integer.toString(board.getSquare(i,j).getValue()),(startY + j*gridSpacing)+20,(startX + (i+1)*gridSpacing)-15,prefilledColor);
+                    canvas.drawText(Integer.toString(board.getSquare(i,j).getValue()),(startY + j*gridSpacing)+20,(startX + (i+1)*gridSpacing)-15,preFilledPaint);
                 }else if(board.getSquare(i,j).getValue() != 0){
-                    canvas.drawText(Integer.toString(board.getSquare(i,j).getValue()),(startY + j*gridSpacing)+20,(startX + (i+1)*gridSpacing)-15,textColor);
+                    canvas.drawText(Integer.toString(board.getSquare(i,j).getValue()),(startY + j*gridSpacing)+20,(startX + (i+1)*gridSpacing)-15,textPaint);
                 }
             }
         }
