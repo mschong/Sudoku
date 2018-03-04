@@ -63,7 +63,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        board = new Board(9);
+        board = new Board(4);
         boardView = findViewById(R.id.boardView);
         boardView.setBoard(board);
         boardView.addSelectionListener(this::squareSelected);

@@ -37,7 +37,7 @@ public class BoardView extends View {
     private final List<SelectionListener> listeners = new ArrayList<>();
 
     /** Number of squares in rows and columns.*/
-    private int boardSize = 9;
+    private int boardSize;
 
     /** Board to be displayed by this view. */
     private Board board;
@@ -126,15 +126,43 @@ public class BoardView extends View {
         final float maxCoord = maxCoord();
         canvas.drawRect(0, 0, maxCoord, maxCoord, boardPaint);
 
-        //Top Line
-        canvas.drawLine(0,0,maxCoord,0, blackPaint);
-        //Bottom Line
-        canvas.drawLine(0,maxCoord,maxCoord,maxCoord, blackPaint);
-        //Left Line
-        canvas.drawLine(0, maxCoord, 0,0, blackPaint);
-        //Right Line
-        canvas.drawLine(maxCoord,0,maxCoord,maxCoord, blackPaint);
+       //Top Line
+       canvas.drawLine(0,0,maxCoord,0, blackPaint);
+       //Bottom Line
+       canvas.drawLine(0,maxCoord,maxCoord,maxCoord, blackPaint);
+       //Left Line
+       canvas.drawLine(0, maxCoord, 0,0, blackPaint);
+       //Right Line
+       canvas.drawLine(maxCoord,0,maxCoord,maxCoord, blackPaint);
 
+       if(boardSize == 4){
+           draw4x4Grid(canvas,maxCoord);
+       }
+       else if(boardSize == 9){
+           draw9x9Grid(canvas, maxCoord);
+       }
+
+
+    }
+
+    private void draw4x4Grid(Canvas canvas, float maxCoord){
+       //vertical bold line
+        canvas.drawLine(maxCoord/2,0,maxCoord/2,maxCoord,blackPaint);
+
+        //horizontal bold line
+        canvas.drawLine(0,maxCoord/2,maxCoord,maxCoord/2,blackPaint);
+
+       /* //vertical gray lines
+        for(int i =1; i < boardSize; i++){
+            canvas.drawLine((maxCoord/boardSize)*i,0,(maxCoord/boardSize)*i,maxCoord,grayPaint);
+        }
+
+        //horizontal gray lines
+        */
+
+    }
+
+    private void draw9x9Grid(Canvas canvas, float maxCoord){
 
         //Vertical bold lines
         canvas.drawLine(maxCoord/(int)Math.sqrt(boardSize),0,maxCoord/(int)Math.sqrt(boardSize),maxCoord,blackPaint);
@@ -143,16 +171,15 @@ public class BoardView extends View {
         canvas.drawLine(0,maxCoord/(int)Math.sqrt(boardSize),maxCoord,maxCoord/(int)Math.sqrt(boardSize),blackPaint);
         canvas.drawLine(0,(maxCoord/(int)Math.sqrt(boardSize))*2,maxCoord,(maxCoord/(int)Math.sqrt(boardSize))*2, blackPaint);
 
-        //Vertical
+        //Vertical gray lines
         for (int i = 1; i < boardSize; i++){
             canvas.drawLine((maxCoord/boardSize)*i,0, (maxCoord/boardSize)*i, maxCoord, grayPaint);
         }
 
-        //Horizontal
+        //Horizontal gray Lines
         for(int i = 1; i < boardSize; i++){
             canvas.drawLine(0,(maxCoord/boardSize)*i,maxCoord,(maxCoord/boardSize)*i,grayPaint);
         }
-
     }
 
 
