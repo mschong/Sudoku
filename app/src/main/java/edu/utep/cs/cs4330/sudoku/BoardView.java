@@ -62,21 +62,18 @@ public class BoardView extends View {
 
     private Paint winBoardPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     {
-        int winColor = Color.GREEN;
-        winBoardPaint.setColor(winColor);
+        winBoardPaint.setColor(Color.GREEN);
         boardPaint.setAlpha(80); //semi transparent
     }
 
     private Paint grayPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     {
-        int grayColor = Color.GRAY;
-        grayPaint.setColor(grayColor);
+        grayPaint.setColor(Color.GRAY);
     }
 
     private final Paint blackPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     {
-        int lineColor = Color.BLACK;
-        blackPaint.setColor(lineColor);
+        blackPaint.setColor(Color.BLACK);
         blackPaint.setStrokeWidth(5);
     }
 
@@ -126,7 +123,7 @@ public class BoardView extends View {
         if (board != null) {
             //If game is not won, it will display regular colored board
                 drawGrid(canvas);
-               drawSquares(canvas);
+                drawSquares(canvas);
                 //If game is won. board will change to color green to indicate the game has been won.
             }
 
@@ -200,15 +197,6 @@ public class BoardView extends View {
 
     /** Draw all the squares (numbers) of the associated board. */
    private void drawSquares(Canvas canvas) {
-        //Paint for the prefilled numbers
-        //Paint prefilledColor = new Paint();
-        //Paint for the user added numbers
-        //Paint textColor = new Paint();
-        //textColor.setColor(Color.BLUE);
-        //textColor.setTextSize(50);
-        //prefilledColor.setColor(Color.BLACK);
-        //prefilledColor.setTextSize(50);
-
         int gridSpacing = getHeight()/ boardSize;
         int sizeOfBoard = boardSize * gridSpacing;
 
