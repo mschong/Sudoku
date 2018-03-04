@@ -9,6 +9,7 @@ public class Board {
 
     /** Size of this board (number of columns/rows). */
     public final int size;
+    public final int difficulty = 1; //easy; default
     public ArrayList<Square> grid = new ArrayList<>();
     public boolean win;
     public boolean isPrefilled;
@@ -16,12 +17,30 @@ public class Board {
     /** Create a new board of the given size. */
     public Board(int size) {
         this.size = size;
-
         initializeGrid();
-       // addRandomNumbers(1);
+        int numberToFill = computeNumberOfPreFills();
+        addRandomNumbers(numberToFill);
     }
 
-
+    private int computeNumberOfPreFills() {
+        if(this.size == 9){ //9x9 puzzle
+            switch(this.difficulty){
+                case 1: //easy
+                    return 17; // pre fill 17 squares
+                case 2: //medium
+                    return 10;
+            }
+        }
+        if(this.size == 4){ //4x4 puzzle
+            switch(this.difficulty){
+                case 1: //easy
+                    return 6; //pre fill 6 squares
+                case 2: //medium
+                    return 4;
+            }
+        }
+        return 1;
+    }
 
 
     //Initialize grid to all 0s
@@ -49,13 +68,13 @@ public class Board {
                 System.out.println("Not a valid number");
             }
             System.out.println("Valid number, inserting " + n);
-            checkWin();
+           checkWin();
 
     }
     //Checks if it's a valid number and it can be added to the game
     private boolean checkNum(int x, int y, int n) {
         // check if is outside grid or if is not between 1 and 9
-        if (n > 9 || x < 0 || y < 0 || x > 8 || y > 8) {
+        if (n > this.size || x < 0 || y < 0 || x > (this.size)-1 || y > (this.size)-1) {
             return false;
         }
         //Can't add number if there is already a number in that square
@@ -86,12 +105,13 @@ public class Board {
     }
 
     //Checks 3x3 subgrid
+    //Modified to check 2x2 subgrid
     private boolean checkSquare(int x, int y, int n) {
-        int row = (int) (Math.floor((x/3))) * 3;
-        int col = (int) (Math.floor((y/3))) * 3;
+        int row = (int) (Math.floor((x/(int)Math.sqrt(size)))) * (int)Math.sqrt(size);
+        int col = (int) (Math.floor((y/(int)Math.sqrt(size)))) * (int)Math.sqrt(size);
 
-        for(int i = row; i < row+3; i++){
-            for(int j = col; j < col+3; j++){
+        for(int i = row; i < row+(int)Math.sqrt(size); i++){
+            for(int j = col; j < col+(int)Math.sqrt(size); j++){
                 if(getSquare(i,j).getValue() == n)
                     return false;
             }
@@ -118,7 +138,7 @@ public class Board {
         return true;
     }
     //Checks if game is won
-    private void checkWin() {
+   private void checkWin() {
         int sum = 0;
         for (int i = 0; i < size; i++) {
             for (int j = 0; j < size; j++) {
@@ -147,9 +167,9 @@ public class Board {
         while (numbers > 0) {
             // nextInt is normally exclusive of the top value,
             // so add 1 to make it inclusive
-            int randomX = rand.nextInt(10);
-            int randomY = rand.nextInt(10);
-            int randomN = rand.nextInt(9) + 1;
+            int randomX = rand.nextInt(this.size+1);
+            int randomY = rand.nextInt(this.size+1);
+            int randomN = rand.nextInt(this.size) + 1;
             if (checkNum(randomX, randomY, randomN)) {
                 getSquare(randomX, randomY).setPrefilled(true);
                 numbers --;
