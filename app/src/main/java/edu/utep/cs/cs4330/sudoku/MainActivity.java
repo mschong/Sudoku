@@ -88,11 +88,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
                 //Restart Activity
-                Intent intent = getIntent();
-                finish();
-                startActivity(intent);
-                toast("New game.");
-                dialogInterface.cancel();
+                recreate();
             }
         });
         alertDialogBuilder.setNegativeButton("No", new DialogInterface.OnClickListener() {
