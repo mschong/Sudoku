@@ -139,10 +139,10 @@ public class MainActivity extends AppCompatActivity {
      */
     private void squareSelected(int x, int y) {
         //Get coordinates of square
-        squareX = y;
-        squareY = x;
+        squareX = x;
+        squareY = y;
 
-        toast(String.format("Square selected: (%d, %d)", y, x));
+        toast(String.format("Square selected: (%d, %d)", x, y));
     }
 
     /** Show a toast message. */

@@ -18,145 +18,196 @@ public class Board {
         this.size = size;
 
         initializeGrid();
-        addRandomNumbers(17);
+        fillBoard();
+        printGrid();
     }
 
-
-
-
-    //Initialize grid to all 0s
-    public void initializeGrid() {
-       for(int i = 0; i < size ; i ++){
-           for(int j = 0; j < size ; j++){
-               grid.add(new Square(i,j));
-           }
-       }
-    }
-
-    public Square getSquare(int x, int y){
-        for(int i = 0; i < grid.size(); i++){
-            if(grid.get(i).getXCoord() == x && grid.get(i).getYCoord() == y)
-                return grid.get(i);
-        }
-        return null;
-    }
-
-
-    //Inserts numbers in given coordinates
-    public void insertNumber(int x, int y, int n) {
-            // check if valid number
-            if (!checkNum(x, y, n)) {
-                System.out.println("Not a valid number");
-            }
-            System.out.println("Valid number, inserting " + n);
-            checkWin();
-
-    }
-    //Checks if it's a valid number and it can be added to the game
-    private boolean checkNum(int x, int y, int n) {
-        // check if is outside grid or if is not between 1 and 9
-        if (n > 9 || x < 0 || y < 0 || x > 8 || y > 8) {
-            return false;
-        }
-        //Can't add number if there is already a number in that square
-        if(getSquare(x,y).getValue() != 0)
-            return false;
-
-        // check column
-        if (!checkColumn(y, n)) {
-            System.out.println("Number already in column");
-            return false;
-        }
-
-        // check row
-        if (!checkRow(x, n)) {
-            System.out.println("Number already in row");
-            return false;
-        }
-
-        // check square
-        if (!checkSquare(y, x, n)) {
-            System.out.println("Number already in square");
-            return false;
-        }
-
-        // if number passes every test add to grid
-        getSquare(x,y).insertValue(n);
-        return true;
-    }
-
-    //Checks 3x3 subgrid
-    private boolean checkSquare(int x, int y, int n) {
-        int row = (int) (Math.floor((x/3))) * 3;
-        int col = (int) (Math.floor((y/3))) * 3;
-
-        for(int i = row; i < row+3; i++){
-            for(int j = col; j < col+3; j++){
-                if(getSquare(i,j).getValue() == n)
-                    return false;
+    private void initializeGrid() {
+        for (int i = 0; i < size; i++) {
+            for (int j = 0; j < size; j++) {
+                grid.add(new Square(i, j));
             }
         }
-        return true;
     }
 
-    //Checks if number is in row
-    private boolean checkRow(int x, int n) {
-        for (int row = 0; row < size; row++) {
-            if (getSquare(x,row).getValue() == n) {
-                return false;
+    private void fillBoard() {
+        for (int x = 0; x < size; x++) {
+            for (int y = 0; y < size; y++) {
+                for (int i = 1; i <= size; i++) {
+                    if (!isWin()) {
+                        if (isValidNumber(x, y, i)) {
+                            getSquare(x, y).setValue(i);
+                        } else {
+                            clearRow(y);
+                            y--;
+                            x = x == (size - 1) ? 0 : x + 1;
+                            break;
+
+                        }
+                        x = x == (size - 1) ? 0 : x + 1;
+                    }
+                }
             }
         }
-        return true;
-    }
-    //Checks if number is in column
-    private boolean checkColumn(int y, int n) {
-        for (int col = 0; col < size; col++) {
-            if (getSquare(col,y).getValue() == n) {
-                return false;
-            }
+        for (int i = 0; i <= 15; i++) {
+            switchRows();
+            switchColumns();
         }
-        return true;
+        randomDraw();
     }
-    //Checks if game is won
-    private void checkWin() {
+
+    private void clearRow(int y) {
+        for (int i = 0; i < size; i++) {
+            getSquare(i, y).setValue(0);
+        }
+    }
+
+    private boolean isWin() {
         int sum = 0;
         for (int i = 0; i < size; i++) {
             for (int j = 0; j < size; j++) {
-                sum += getSquare(i,j).getValue();
+                sum += getSquare(i, j).getValue();
                 // if there are still empty squares
-                if (getSquare(i,j).getValue() == 0) {
-                    return;
+                if (getSquare(i, j).getValue() == 0) {
+                    return false;
                 }
             }
         }
         // double check if sum of numbers is correct
         if (sum == 405) {
             win = true;
-            System.out.println("YOU WIN!");
+            return true;
+        }
+        return false;
+    }
+
+    public Square getSquare(int x, int y) {
+        for (int i = 0; i < grid.size(); i++) {
+            if (grid.get(i).getXCoord() == x && grid.get(i).getYCoord() == y)
+                return grid.get(i);
+        }
+        return null;
+    }
+
+    private boolean isValidNumber(int x, int y, int val) {
+        if (getSquare(x, y).getValue() != 0) {
+            return false;
+        }
+
+        if (!inColumn(x, y, val)) {
+            return false;
+        }
+
+        // check row
+        if (!inRow(x, y, val)) {
+            return false;
+        }
+
+        // check square
+        if (!inSquare(x, y, val)) {
+            return false;
+        }
+
+        return true;
+    }
+
+    private boolean inSquare(int x, int y, int n) {
+        int row = (int) (Math.floor((y / 3))) * 3;
+        int col = (int) (Math.floor((x / 3))) * 3;
+
+        for (int i = row; i < row + 3; i++) {
+            for (int j = col; j < col + 3; j++) {
+                if (getSquare(j, i).getValue() == n)
+                    return false;
+            }
+        }
+        return true;
+    }
+
+    // Checks if number is in row
+    private boolean inColumn(int x, int y, int n) {
+        for (int row = 0; row < size; row++) {
+            if (getSquare(x, row).getValue() == n) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    // Checks if number is in column
+    private boolean inRow(int x, int y, int n) {
+        for (int col = 0; col < size; col++) {
+            if (getSquare(col, y).getValue() == n) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public  void printGrid() {
+        System.out.println("\n+===+===+===+===+===+===+===+===+===+");
+        for (int i = 0; i < size; i++) {
+            System.out.print("|");
+            for (int j = 0; j < size; j++) {
+                if (j % 3 == 2) {
+                    System.out
+                            .print(" " + ((getSquare(j, i).getValue() == 0) ? " " : getSquare(j, i).getValue()) + " !");
+                } else {
+                    System.out
+                            .print(" " + ((getSquare(j, i).getValue() == 0) ? " " : getSquare(j, i).getValue()) + " |");
+                }
+            }
+            if (i % 3 == 2) {
+                System.out.println("\n+===+===+===+===+===+===+===+===+===+");
+
+            } else {
+                System.out.println("\n+---+---+---+---+---+---+---+---+---+");
+            }
         }
     }
-    //True when a prefilled value is added
-    /**private void insertPrefilled(int x, int y){
-        prefilled[y][x] = true;
-    }**/
 
-    //Create prefilled values
-    private void addRandomNumbers(int numbers) {
-        Random rand = new Random();
-
-        while (numbers > 0) {
-            // nextInt is normally exclusive of the top value,
-            // so add 1 to make it inclusive
-            int randomX = rand.nextInt(10);
-            int randomY = rand.nextInt(10);
-            int randomN = rand.nextInt(9) + 1;
-            if (checkNum(randomX, randomY, randomN)) {
-                getSquare(randomX, randomY).setPrefilled(true);
-                numbers --;
+    private int getSubgrid(int n) {
+        int coord = (int) (Math.floor((n / 3))) * 3;
+        int[] coords = new int[2];
+        for (int i = coord, j = 0; i <= coord + 2; i++) {
+            if (i != n) {
+                coords[j] = i;
+                j++;
             }
-
         }
+        Random rand = new Random();
+        return coords[rand.nextInt(2)];
 
+    }
+
+    private void switchRows() {
+        Random rand = new Random();
+        int row = rand.nextInt(size);
+        int newRow = getSubgrid(row);
+
+        int[] temp = new int[size];
+        for (int i = 0; i < temp.length; i++) {
+            temp[i] = getSquare(i, row).getValue();
+        }
+        for (int i = 0; i < size; i++) {
+            getSquare(i, row).setValue(getSquare(i, newRow).getValue());
+            getSquare(i, newRow).setValue(temp[i]);
+        }
+    }
+
+    private void switchColumns(){
+        Random rand = new Random();
+        int col = rand.nextInt(size);
+        int newCol = getSubgrid(col);
+
+        int[] temp = new int[size];
+        for (int i = 0; i < temp.length; i++) {
+            temp[i] = getSquare(col, i).getValue();
+        }
+        for (int i = 0; i < size; i++) {
+            getSquare(col, i).setValue(getSquare(newCol, i).getValue());
+            getSquare(newCol, i).setValue(temp[i]);
+        }
     }
     //Inserts zero to delete a number
     public void insertZero(int x, int y){
@@ -164,6 +215,34 @@ public class Board {
             getSquare(x,y).setValue(0);
         } else{
             isPrefilled = true;
+        }
+    }
+
+    public boolean insertNumber(int x, int y, int n) {
+        // check if valid number
+        if (n!=getSquare(x,y).getValue()) {
+            System.out.println("Not a valid number");
+            return false;
+        }
+        System.out.println("Valid number, inserting " + n);
+        isWin();
+        return true;
+
+    }
+
+    private void randomDraw(){
+        Random rand = new Random();
+
+        for(int i = 0; i < 50; i++){
+            int x = rand.nextInt(9);
+            int y = rand.nextInt(9);
+            if(getSquare(x, y).getDraw()){
+                getSquare(x, y).setDraw(false);
+                getSquare(x,y).setPrefilled(false);
+            }
+            else{
+                i--;
+            }
         }
     }
 
