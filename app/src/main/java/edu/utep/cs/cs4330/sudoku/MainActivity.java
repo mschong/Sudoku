@@ -109,26 +109,45 @@ public class MainActivity extends AppCompatActivity {
      */
     public void numberClicked(int n) {
         //Gets selected square's coords and inserts number
-        if(board.getSquare(squareX,squareY).getValue() == 0){
-            board.insertNumber(squareX, squareY, n);
-            //if game is won, display winning message
-            if(board.win){
-                boardView.win = true;
-                toast("YOU WIN!");
-            }
-            boardView.postInvalidate();
-            //Delete a number that is not from the prefilled
-        } else if(board.getSquare(squareX,squareY).getValue() != 0 && n==0){
+        if(n==0 && board.getSquare(squareX,squareY).getUserValue()!=0){
             board.insertZero(squareX,squareY);
+            board.getSquare(squareX,squareY).setDraw(false);
             if(board.isPrefilled)
                 toast("Can't delete prefilled value");
             boardView.postInvalidate();
-        }
-        else{
-            //Can't enter a number where there is a number already
+        }else if(board.getSquare(squareX,squareY).getUserValue()==0 && n!=0){
+            board.insertNumber(squareX, squareY, n);
+            //if game is won, display winning message
+//            if(board.win){
+//                boardView.win = true;
+//                toast("YOU WIN!");
+//            }
+            boardView.postInvalidate();
+        } else{
             toast("Space is taken.");
         }
-       // toast("Number clicked: " + n);
+
+//
+//        if(board.getSquare(squareX,squareY).getValue() == 0){
+//            board.insertNumber(squareX, squareY, n);
+//            //if game is won, display winning message
+//            if(board.win){
+//                boardView.win = true;
+//                toast("YOU WIN!");
+//            }
+//            boardView.postInvalidate();
+//            //Delete a number that is not from the prefilled
+//        } else if(board.getSquare(squareX,squareY).getValue() != 0 && n==0){
+//            board.insertZero(squareX,squareY);
+//            if(board.isPrefilled)
+//                toast("Can't delete prefilled value");
+//            boardView.postInvalidate();
+//        }
+//        else{
+//            //Can't enter a number where there is a number already
+//            toast("Space is taken.");
+//        }
+//       // toast("Number clicked: " + n);
     }
 
     /**

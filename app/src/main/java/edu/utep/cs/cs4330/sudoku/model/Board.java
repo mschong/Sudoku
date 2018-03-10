@@ -212,21 +212,20 @@ public class Board {
     //Inserts zero to delete a number
     public void insertZero(int x, int y){
         if(!getSquare(x,y).getPrefilled()) {
-            getSquare(x,y).setValue(0);
+            getSquare(x,y).setDraw(false);
         } else{
             isPrefilled = true;
         }
     }
 
-    public boolean insertNumber(int x, int y, int n) {
+    public void insertNumber(int x, int y, int n) {
         // check if valid number
-        if (n!=getSquare(x,y).getValue()) {
-            System.out.println("Not a valid number");
-            return false;
+        if (getSquare(x,y).getUserValue()==0) {
+            System.out.println("Valid number, inserting " + n);
+            getSquare(x, y).insertUserValue(n);
+            getSquare(x, y).setDraw(true);
+            isWin();
         }
-        System.out.println("Valid number, inserting " + n);
-        isWin();
-        return true;
 
     }
 

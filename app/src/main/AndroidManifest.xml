@@ -16,7 +16,12 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".Menu"></activity>
+        <activity android:name=".Menu">
+            <intent-filter>
+                <action android:name="edu.utep.cs.cs4330.sudoku.Menu"></action>
+                <category android:name="android.intent.category.DEFAULT"></category>
+            </intent-filter>
+        </activity>
     </application>
 
 </manifest>

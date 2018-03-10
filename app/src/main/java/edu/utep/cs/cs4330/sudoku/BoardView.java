@@ -175,23 +175,16 @@ public class BoardView extends View {
         for(int i = 0;i< board.size; i++){
             for(int j = 0; j<board.size; j++){
                 //Check if it's one of the prefilled values
-//                if(board.getSquare(i,j).getValue() != 0 && board.getSquare(i,j).getPrefilled()==true){
-//                    canvas.drawText(Integer.toString(board.getSquare(i,j).getValue()),(startY + j*gridSpacing)+20,(startX + (i+1)*gridSpacing)-15,prefilledColor);
-//                }else if(board.getSquare(i,j).getValue() != 0){
-//                    canvas.drawText(Integer.toString(board.getSquare(i,j).getValue()),(startY + j*gridSpacing)+20,(startX + (i+1)*gridSpacing)-15,textColor);
-//                }
                 if(board.getSquare(j,i).getDraw() && board.getSquare(j,i).getPrefilled()){
                     canvas.drawText(Integer.toString(board.getSquare(i,j).getValue()),(startX + (i+1)*gridSpacing-35)-15,(startY + j*gridSpacing)+55,prefilledColor);
                 } else if(board.getSquare(j,i).getDraw()){
-                    canvas.drawText(Integer.toString(board.getSquare(i,j).getValue()),(startX + (i+1)*gridSpacing)-15,(startY + j*gridSpacing)+20,textColor);
+                    canvas.drawText(Integer.toString(board.getSquare(j,i).getUserValue()),(startY + j*gridSpacing)+21,(startX + (i+1)*gridSpacing-17)-1,textColor);
                 }
             }
         }
 
 
     }
-
-
 
     /** Overridden here to detect tapping on the board and
      * to notify the selected square if exists. */
