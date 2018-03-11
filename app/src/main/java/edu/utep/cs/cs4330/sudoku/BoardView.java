@@ -55,8 +55,6 @@ public class BoardView extends View {
 
     boolean win;
 
-    public boolean selectionMade;
-
     private int selectedX = -1;
 
     private int selectedY = -1;
@@ -113,15 +111,6 @@ public class BoardView extends View {
     public void setSelectedY(int y){
         this.selectedY = y;
     }
-
-    public int getSelectedX(){
-        return selectedX;
-    }
-
-    public int getSelectedY(){
-        return selectedY;
-    }
-
 
     /** Create a new board view to be run in the given context. */
     public BoardView(Context context) { //@cons
@@ -188,6 +177,7 @@ public class BoardView extends View {
 
     }
 
+    /**Draw custom lines for a 4x4 Sudoku**/
     private void draw4x4Grid(Canvas canvas, float maxCoord){
        //vertical bold line
         canvas.drawLine(maxCoord/2,0,maxCoord/2,maxCoord,blackPaint);
@@ -207,6 +197,7 @@ public class BoardView extends View {
 
     }
 
+    /**Draw custom lines for a 9x9 Sudoku*/
     private void draw9x9Grid(Canvas canvas, float maxCoord){
 
         //Vertical bold lines
@@ -248,25 +239,15 @@ public class BoardView extends View {
                 }
             }
         }
-      /* System.out.println("selectedX = " + selectedX + "selectedY = " + selectedY);
-       float diff = maxCoord() /(float)boardSize;
-       if(selectedX != -1 && selectedY != -1){
-           canvas.drawRect(selectedX*diff,selectedY*diff,selectedX*diff+diff,selectedY*diff+diff,squareSelectionPaint);
-           //System.out.println("left = " + selectedX*diff);
-           //System.out.println("top = " + selectedY+diff);
-       }*/
-
 
     }
 
+    /**Draws a red border around the cell the user selected**/
     private void drawSelection(Canvas canvas){
-       System.out.println("In drawSelection");
-       System.out.println("selectedX = " + selectedX + "selectedY = " + selectedY);
+       //the difference between board size and the selected x-coordinate
        float diff = maxCoord() /(float)boardSize;
        if(selectedX != -1 && selectedY != -1){
            canvas.drawRect(selectedX*diff,selectedY*diff,selectedX*diff+diff,selectedY*diff+diff,squareSelectionPaint);
-           //System.out.println("left = " + selectedX*diff);
-           //System.out.println("top = " + selectedY+diff);
        }
 
     }

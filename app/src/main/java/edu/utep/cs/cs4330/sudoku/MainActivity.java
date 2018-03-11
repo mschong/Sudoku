@@ -37,7 +37,7 @@ import edu.utep.cs.cs4330.sudoku.model.Board;
  *  }
  * </pre>
  *
- * @author Yoonsik Cheon, Marina Chong, Jessica Dozal
+ * @author Yoonsik Cheon, Marina Chong, Ana Garcia
  */
 public class MainActivity extends AppCompatActivity {
 
@@ -63,7 +63,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        board = new Board(9);
+        board = new Board(4);
         boardView = findViewById(R.id.boardView);
         boardView.setBoard(board);
         boardView.addSelectionListener(this::squareSelected);
@@ -120,7 +120,7 @@ public class MainActivity extends AppCompatActivity {
                 boardView.win = true;
                 toast("YOU WIN!");
             }
-            boardView.postInvalidate();
+            boardView.postInvalidate(); //force the screen to redraw
             //Delete a number that is not from the prefilled
         } else if(board.getSquare(squareX,squareY).getValue() != 0 && n==0){
             board.insertZero(squareX,squareY);
@@ -145,16 +145,14 @@ public class MainActivity extends AppCompatActivity {
         //Get coordinates of square
         squareX = y;
         squareY = x;
-       //boardView.selectionMade = true;
-       boardView.setSelectedX(x);
-       //System.out.println("Changed setSelectedX");
-       //System.out.println("setSelectedX = " + boardView.getSelectedX());
-
-       boardView.setSelectedY(y);
-       boardView.postInvalidate();
-       //System.out.println("Changed setSelectedY");
-        //System.out.println("setSelectedY = " + boardView.getSelectedY());
-       toast(String.format("Square selected: (%d, %d)", y, x));
+        /*Update selected x,y coordinates in BoardView
+        to draw a red border around the selected cell.
+         */
+        boardView.setSelectedX(x);
+        boardView.setSelectedY(y);
+        //force the screen to redraw upon selection
+        boardView.postInvalidate();
+        toast(String.format("Square selected: (%d, %d)", y, x));
     }
 
     /** Show a toast message. */
