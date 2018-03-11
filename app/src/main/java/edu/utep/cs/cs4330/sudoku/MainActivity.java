@@ -63,7 +63,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        board = new Board(4);
+        board = new Board(9);
         boardView = findViewById(R.id.boardView);
         boardView.setBoard(board);
         boardView.addSelectionListener(this::squareSelected);
@@ -145,8 +145,16 @@ public class MainActivity extends AppCompatActivity {
         //Get coordinates of square
         squareX = y;
         squareY = x;
+       //boardView.selectionMade = true;
+       boardView.setSelectedX(x);
+       //System.out.println("Changed setSelectedX");
+       //System.out.println("setSelectedX = " + boardView.getSelectedX());
 
-        toast(String.format("Square selected: (%d, %d)", y, x));
+       boardView.setSelectedY(y);
+       boardView.postInvalidate();
+       //System.out.println("Changed setSelectedY");
+        //System.out.println("setSelectedY = " + boardView.getSelectedY());
+       toast(String.format("Square selected: (%d, %d)", y, x));
     }
 
     /** Show a toast message. */

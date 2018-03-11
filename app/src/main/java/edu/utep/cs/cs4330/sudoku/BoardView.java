@@ -8,6 +8,7 @@ import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewTreeObserver;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -52,6 +53,14 @@ public class BoardView extends View {
     /** Translation of screen coordinates to display the grid at the center. */
     private float transY;
 
+    boolean win;
+
+    public boolean selectionMade;
+
+    private int selectedX = -1;
+
+    private int selectedY = -1;
+
     /** Paint to draw the background of the grid. */
     private Paint boardPaint= new Paint(Paint.ANTI_ALIAS_FLAG);
     {
@@ -89,7 +98,30 @@ public class BoardView extends View {
         textPaint.setTextSize(50);
     }
 
-    boolean win;
+    private final Paint squareSelectionPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+    {
+        squareSelectionPaint.setColor(Color.RED);
+        squareSelectionPaint.setStyle(Paint.Style.STROKE);
+        squareSelectionPaint.setStrokeWidth(3);
+    }
+
+
+    public void setSelectedX(int x){
+        this.selectedX = x;
+    }
+
+    public void setSelectedY(int y){
+        this.selectedY = y;
+    }
+
+    public int getSelectedX(){
+        return selectedX;
+    }
+
+    public int getSelectedY(){
+        return selectedY;
+    }
+
 
     /** Create a new board view to be run in the given context. */
     public BoardView(Context context) { //@cons
@@ -124,6 +156,7 @@ public class BoardView extends View {
             //If game is not won, it will display regular colored board
                 drawGrid(canvas);
                 drawSquares(canvas);
+                drawSelection(canvas);
                 //If game is won. board will change to color green to indicate the game has been won.
             }
 
@@ -132,6 +165,7 @@ public class BoardView extends View {
 
     /** Draw horizontal and vertical grid lines. */
    private void drawGrid(Canvas canvas) {
+       System.out.println("in drawGrid");
         final float maxCoord = maxCoord();
         canvas.drawRect(0, 0, maxCoord, maxCoord, boardPaint);
 
@@ -197,6 +231,7 @@ public class BoardView extends View {
 
     /** Draw all the squares (numbers) of the associated board. */
    private void drawSquares(Canvas canvas) {
+       System.out.println("in drawSquares");
         int gridSpacing = getHeight()/ boardSize;
         int sizeOfBoard = boardSize * gridSpacing;
 
@@ -213,7 +248,26 @@ public class BoardView extends View {
                 }
             }
         }
+      /* System.out.println("selectedX = " + selectedX + "selectedY = " + selectedY);
+       float diff = maxCoord() /(float)boardSize;
+       if(selectedX != -1 && selectedY != -1){
+           canvas.drawRect(selectedX*diff,selectedY*diff,selectedX*diff+diff,selectedY*diff+diff,squareSelectionPaint);
+           //System.out.println("left = " + selectedX*diff);
+           //System.out.println("top = " + selectedY+diff);
+       }*/
 
+
+    }
+
+    private void drawSelection(Canvas canvas){
+       System.out.println("In drawSelection");
+       System.out.println("selectedX = " + selectedX + "selectedY = " + selectedY);
+       float diff = maxCoord() /(float)boardSize;
+       if(selectedX != -1 && selectedY != -1){
+           canvas.drawRect(selectedX*diff,selectedY*diff,selectedX*diff+diff,selectedY*diff+diff,squareSelectionPaint);
+           //System.out.println("left = " + selectedX*diff);
+           //System.out.println("top = " + selectedY+diff);
+       }
 
     }
 
