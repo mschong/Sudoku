@@ -37,7 +37,7 @@ import edu.utep.cs.cs4330.sudoku.model.Board;
  *  }
  * </pre>
  *
- * @author Yoonsik Cheon, Marina Chong, Jessica Dozal
+ * @author Yoonsik Cheon, Marina Chong, Ana Garcia
  */
 public class MainActivity extends AppCompatActivity {
 
@@ -63,7 +63,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        board = new Board(9);
+        board = new Board(4);
         boardView = findViewById(R.id.boardView);
         boardView.setBoard(board);
         boardView.addSelectionListener(this::squareSelected);
@@ -158,10 +158,16 @@ public class MainActivity extends AppCompatActivity {
      */
     private void squareSelected(int x, int y) {
         //Get coordinates of square
-        squareX = x;
-        squareY = y;
-
-        toast(String.format("Square selected: (%d, %d)", x, y));
+        squareX = y;
+        squareY = x;
+        /*Update selected x,y coordinates in BoardView
+        to draw a red border around the selected cell.
+         */
+        boardView.setSelectedX(x);
+        boardView.setSelectedY(y);
+        //force the screen to redraw upon selection
+        boardView.postInvalidate();
+        toast(String.format("Square selected: (%d, %d)", y, x));
     }
 
     /** Show a toast message. */

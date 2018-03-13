@@ -9,6 +9,7 @@ public class Board {
 
     /** Size of this board (number of columns/rows). */
     public final int size;
+    public final int difficulty = 1; //easy; default
     public ArrayList<Square> grid = new ArrayList<>();
     public boolean win;
     public boolean isPrefilled;
@@ -16,10 +17,29 @@ public class Board {
     /** Create a new board of the given size. */
     public Board(int size) {
         this.size = size;
-
         initializeGrid();
-        fillBoard();
-        printGrid();
+        int numberToFill = computeNumberOfPreFills();
+        addRandomNumbers(numberToFill);
+    }
+
+    private int computeNumberOfPreFills() {
+        if(this.size == 9){ //9x9 puzzle
+            switch(this.difficulty){
+                case 1: //easy
+                    return 17; // pre fill 17 squares
+                case 2: //medium
+                    return 10;
+            }
+        }
+        if(this.size == 4){ //4x4 puzzle
+            switch(this.difficulty){
+                case 1: //easy
+                    return 6; //pre fill 6 squares
+                case 2: //medium
+                    return 4;
+            }
+        }
+        return 1;
     }
 
     private void initializeGrid() {
@@ -144,7 +164,7 @@ public class Board {
         return true;
     }
 
-    public  void printGrid() {
+  public  void printGrid() {
         System.out.println("\n+===+===+===+===+===+===+===+===+===+");
         for (int i = 0; i < size; i++) {
             System.out.print("|");
@@ -184,7 +204,6 @@ public class Board {
         Random rand = new Random();
         int row = rand.nextInt(size);
         int newRow = getSubgrid(row);
-
         int[] temp = new int[size];
         for (int i = 0; i < temp.length; i++) {
             temp[i] = getSquare(i, row).getValue();
