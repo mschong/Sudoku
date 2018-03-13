@@ -25,7 +25,7 @@
 
     <RadioGroup
         android:id="@+id/boardSize"
-        android:layout_width="146dp"
+        android:layout_width="145dp"
         android:layout_height="49dp"
         android:layout_marginBottom="8dp"
         android:layout_marginEnd="8dp"
@@ -36,7 +36,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.446">
+        app:layout_constraintVertical_bias="0.441">
 
         <RadioButton
             android:id="@+id/button4x4"
@@ -86,7 +86,7 @@
         app:layout_constraintHorizontal_bias="0.504"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.724">
+        app:layout_constraintVertical_bias="0.713">
 
         <RadioButton
             android:id="@+id/easyButton"
@@ -181,6 +181,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.935" />
+        app:layout_constraintVertical_bias="0.894" />
 
 </android.support.constraint.ConstraintLayout>
