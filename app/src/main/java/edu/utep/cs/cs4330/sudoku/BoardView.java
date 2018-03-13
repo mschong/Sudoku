@@ -233,9 +233,9 @@ public class BoardView extends View {
             for(int j = 0; j<board.size; j++){
                 //Check if it's one of the prefilled values
                 if(board.getSquare(j,i).getDraw() && board.getSquare(j,i).getPrefilled()){
-                    canvas.drawText(Integer.toString(board.getSquare(i,j).getValue()),(startX + (i+1)*gridSpacing-35)-15,(startY + j*gridSpacing)+55,prefilledColor);
+                    canvas.drawText(Integer.toString(board.getSquare(i,j).getValue()),(startX + (i+1)*gridSpacing-35)-15,(startY + j*gridSpacing)+55,preFilledPaint);
                 } else if(board.getSquare(j,i).getDraw()){
-                    canvas.drawText(Integer.toString(board.getSquare(j,i).getUserValue()),(startY + j*gridSpacing)+21,(startX + (i+1)*gridSpacing-17)-1,textColor);
+                    canvas.drawText(Integer.toString(board.getSquare(j,i).getUserValue()),(startY + j*gridSpacing)+21,(startX + (i+1)*gridSpacing-17)-1,textPaint);
                 }
             }
         }
