@@ -11,7 +11,6 @@ public class Square {
     private int value;
     private boolean draw;
     private int userValue;
-    private boolean correctValue;
 
     public Square(int xCoord, int yCoord){
         this.xCoord = xCoord;
@@ -20,7 +19,6 @@ public class Square {
         this.prefilled = true;
         this.draw = true;
         this.userValue = 0;
-        this.correctValue = true;
     }
 
 
@@ -33,10 +31,6 @@ public class Square {
     }
     public int getYCoord(){
         return this.yCoord;
-    }
-
-    public boolean isCorrectValue(){
-        return this.correctValue;
     }
 
     public int getUserValue(){
@@ -67,8 +61,5 @@ public class Square {
         this.draw = draw;
     }
 
-    public void setCorrectValue(boolean correctValue){
-        this.correctValue = correctValue;
-    }
 
 }

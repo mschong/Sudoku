@@ -52,8 +52,63 @@ public class BoardView extends View {
     /** Translation of screen coordinates to display the grid at the center. */
     private float transY;
 
+    private int selectedX = -1;
+
+    private int selectedY = -1;
+
     /** Paint to draw the background of the grid. */
-    private Paint boardPaint;
+    private Paint boardPaint= new Paint(Paint.ANTI_ALIAS_FLAG);
+    {
+        int boardColor = Color.rgb(201, 186, 145);
+        boardPaint.setColor(boardColor);
+        boardPaint.setAlpha(80); // semi transparent
+    };
+
+    private Paint winBoardPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+    {
+        winBoardPaint.setColor(Color.rgb(187, 255, 153));
+        boardPaint.setAlpha(80); //semi transparent
+    }
+
+    private Paint grayPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+    {
+        grayPaint.setColor(Color.GRAY);
+    }
+
+    private final Paint blackPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+    {
+        blackPaint.setColor(Color.BLACK);
+        blackPaint.setStrokeWidth(5);
+    }
+
+    private final Paint preFilledPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+    {
+        preFilledPaint.setColor(Color.BLACK);
+        preFilledPaint.setTextSize(50);
+    }
+
+    private final Paint textPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+    {
+        textPaint.setColor(Color.BLUE);
+        textPaint.setTextSize(50);
+    }
+
+    private final Paint squareSelectionPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+    {
+        squareSelectionPaint.setColor(Color.RED);
+        squareSelectionPaint.setStyle(Paint.Style.STROKE);
+        squareSelectionPaint.setStrokeWidth(3);
+    }
+
+
+    public void setSelectedX(int x){
+        this.selectedX = x;
+    }
+
+    public void setSelectedY(int y){
+        this.selectedY = y;
+    }
+
 
     boolean win;
 
@@ -90,82 +145,86 @@ public class BoardView extends View {
         canvas.translate(transX, transY);
         if (board != null) {
             //If game is not won, it will display regular colored board
-            if(!win) {
-                boardPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-                {
-                    int boardColor = Color.rgb(201, 186, 145);
-                    boardPaint.setColor(boardColor);
-                    boardPaint.setAlpha(80); // semi transparent
-                }
-                drawGrid(canvas);
-            } else{
-                //If game is won. board will change to color green to indicate the game has been won.
-                boardPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-                {
-                    int boardColor = Color.rgb(178, 255, 102);
-                    boardPaint.setColor(boardColor);
-                    boardPaint.setAlpha(80); // semi transparent
-                }
-                drawGrid(canvas);
-            }
+            drawGrid(canvas);
             drawSquares(canvas);
+            drawSelection(canvas);
+            //If game is won. board will change to color green to indicate the game has been won.
         }
+
         canvas.translate(-transX, -transY);
     }
 
     /** Draw horizontal and vertical grid lines. */
     private void drawGrid(Canvas canvas) {
+        System.out.println("in drawGrid");
         final float maxCoord = maxCoord();
-        canvas.drawRect(0, 0, maxCoord, maxCoord, boardPaint);
-        //Paint for 9x9 grid
-        Paint grayPaint = new Paint();
-        grayPaint.setColor(Color.GRAY);
-        //Paint for 3x3 subgrid borders
-        Paint blackPaint = new Paint();
-        blackPaint.setColor(Color.BLACK);
-        blackPaint.setStrokeWidth(5);
+        if(!board.win)
+            canvas.drawRect(0, 0, maxCoord, maxCoord, boardPaint);
+        else
+            canvas.drawRect(0, 0, maxCoord, maxCoord, winBoardPaint);
 
         //Top Line
         canvas.drawLine(0,0,maxCoord,0, blackPaint);
         //Bottom Line
-        canvas.drawLine(0,maxCoord-5,maxCoord,maxCoord, blackPaint);
+        canvas.drawLine(0,maxCoord,maxCoord,maxCoord, blackPaint);
         //Left Line
         canvas.drawLine(0, maxCoord, 0,0, blackPaint);
         //Right Line
         canvas.drawLine(maxCoord,0,maxCoord,maxCoord, blackPaint);
 
-        //Vertical bold lines
-        canvas.drawLine(maxCoord/3,0,maxCoord/3,maxCoord,blackPaint);
-        canvas.drawLine((maxCoord/3)*2, 0, (maxCoord/3)*2,maxCoord,blackPaint);
-        //Horizontal bold lines
-        canvas.drawLine(0,maxCoord/3,maxCoord,maxCoord/3,blackPaint);
-        canvas.drawLine(0,(maxCoord/3)*2,maxCoord,(maxCoord/3)*2, blackPaint);
-
-        //Vertical
-        for (int i = 1; i < boardSize; i++){
-            canvas.drawLine((maxCoord/boardSize)*i,0, (maxCoord/boardSize)*i, maxCoord, grayPaint);
+        if(boardSize == 4){
+            draw4x4Grid(canvas,maxCoord);
         }
-
-        //Horizontal
-        for(int i = 1; i < boardSize; i++){
-            canvas.drawLine(0,(maxCoord/boardSize)*i,maxCoord,(maxCoord/boardSize)*i,grayPaint);
+        else if(boardSize == 9){
+            draw9x9Grid(canvas, maxCoord);
         }
 
     }
 
+    /**Draw custom lines for a 4x4 Sudoku**/
+    private void draw4x4Grid(Canvas canvas, float maxCoord){
+        //vertical bold line
+        canvas.drawLine(maxCoord/2,0,maxCoord/2,maxCoord,blackPaint);
+
+        //horizontal bold line
+        canvas.drawLine(0,maxCoord/2,maxCoord,maxCoord/2,blackPaint);
+
+        //vertical gray lines
+        for(int i =1; i < boardSize; i++){
+            canvas.drawLine((maxCoord/boardSize)*i,0,(maxCoord/boardSize)*i,maxCoord,grayPaint);
+        }
+
+        //horizontal gray lines
+        for(int i = 1; i < boardSize; i++){
+            canvas.drawLine(0,(maxCoord/boardSize)*i, maxCoord,(maxCoord/boardSize)*i,grayPaint);
+        }
+
+    }
+
+    /**Draw custom lines for a 9x9 Sudoku*/
+    private void draw9x9Grid(Canvas canvas, float maxCoord){
+
+        //Vertical bold lines
+        canvas.drawLine(maxCoord/(int)Math.sqrt(boardSize),0,maxCoord/(int)Math.sqrt(boardSize),maxCoord,blackPaint);
+        canvas.drawLine((maxCoord/(int)Math.sqrt(boardSize))*2, 0, (maxCoord/(int)Math.sqrt(boardSize))*2,maxCoord,blackPaint);
+        //Horizontal bold lines
+        canvas.drawLine(0,maxCoord/(int)Math.sqrt(boardSize),maxCoord,maxCoord/(int)Math.sqrt(boardSize),blackPaint);
+        canvas.drawLine(0,(maxCoord/(int)Math.sqrt(boardSize))*2,maxCoord,(maxCoord/(int)Math.sqrt(boardSize))*2, blackPaint);
+
+        //Vertical gray lines
+        for (int i = 1; i < boardSize; i++){
+            canvas.drawLine((maxCoord/boardSize)*i,0, (maxCoord/boardSize)*i, maxCoord, grayPaint);
+        }
+
+        //Horizontal gray Lines
+        for(int i = 1; i < boardSize; i++){
+            canvas.drawLine(0,(maxCoord/boardSize)*i,maxCoord,(maxCoord/boardSize)*i,grayPaint);
+        }
+    }
 
 
     /** Draw all the squares (numbers) of the associated board. */
     private void drawSquares(Canvas canvas) {
-        //Paint for the prefilled numbers
-        Paint prefilledColor = new Paint();
-        //Paint for the user added numbers
-        Paint textColor = new Paint();
-        textColor.setColor(Color.BLUE);
-        textColor.setTextSize(50);
-        prefilledColor.setColor(Color.BLACK);
-        prefilledColor.setTextSize(50);
-
         int gridSpacing = getHeight()/ 9;
         int boardSize = 9 * gridSpacing;
 
@@ -175,14 +234,24 @@ public class BoardView extends View {
         for(int i = 0;i< board.size; i++){
             for(int j = 0; j<board.size; j++){
                 //Check if it's one of the prefilled values
-                if(board.getSquare(j,i).getDraw() && board.getSquare(j,i).getPrefilled()){
-                    canvas.drawText(Integer.toString(board.getSquare(i,j).getValue()),(startX + (i+1)*gridSpacing-35)-15,(startY + j*gridSpacing)+55,prefilledColor);
-                } else if(board.getSquare(j,i).getDraw()){
-                    canvas.drawText(Integer.toString(board.getSquare(j,i).getUserValue()),(startY + j*gridSpacing)+21,(startX + (i+1)*gridSpacing-17)-1,textColor);
+                if(board.getSquare(i,j).getDraw() && board.getSquare(i,j).getPrefilled()){
+                    canvas.drawText(Integer.toString(board.getSquare(i,j).getValue()),(startX + (i+1)*gridSpacing-35)-15,(startY + j*gridSpacing)+55,preFilledPaint);
+                } else if(board.getSquare(i,j).getDraw()){
+                    canvas.drawText(Integer.toString(board.getSquare(i,j).getUserValue()),(startX + (i+1)*gridSpacing-35)-15,(startY + j*gridSpacing)+55,textPaint);
                 }
             }
         }
 
+
+    }
+
+    /**Draws a red border around the cell the user selected**/
+    private void drawSelection(Canvas canvas){
+        //the difference between board size and the selected x-coordinate
+        float diff = maxCoord() /(float)boardSize;
+        if(selectedX != -1 && selectedY != -1){
+            canvas.drawRect(selectedX*diff,selectedY*diff,selectedX*diff+diff,selectedY*diff+diff,squareSelectionPaint);
+        }
 
     }
 
