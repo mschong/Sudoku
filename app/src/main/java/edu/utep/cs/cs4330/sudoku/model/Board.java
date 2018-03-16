@@ -12,23 +12,25 @@ public class Board {
     public final int difficulty = 1; //easy; default
     public ArrayList<Square> grid = new ArrayList<>();
     public boolean win;
-    public boolean isPrefilled;
+    public int numberToFill;
 
     /** Create a new board of the given size. */
     public Board(int size) {
         this.size = size;
+        this.numberToFill = computeNumberOfPreFills();
         initializeGrid();
-        int numberToFill = computeNumberOfPreFills();
-        addRandomNumbers(numberToFill);
+        fillBoard();
+        printGrid();
+
     }
 
     private int computeNumberOfPreFills() {
         if(this.size == 9){ //9x9 puzzle
             switch(this.difficulty){
                 case 1: //easy
-                    return 17; // pre fill 17 squares
+                    return (size*size)-32; // pre fill 17 squares
                 case 2: //medium
-                    return 10;
+                    return (size*size)-17;
             }
         }
         if(this.size == 4){ //4x4 puzzle
@@ -54,7 +56,7 @@ public class Board {
         for (int x = 0; x < size; x++) {
             for (int y = 0; y < size; y++) {
                 for (int i = 1; i <= size; i++) {
-                    if (!isWin()) {
+                    if (!isSolvable()) {
                         if (isValidNumber(x, y, i)) {
                             getSquare(x, y).setValue(i);
                         } else {
@@ -69,10 +71,11 @@ public class Board {
                 }
             }
         }
-        for (int i = 0; i <= 15; i++) {
+        for (int i = 0; i <= 40; i++) {
             switchRows();
             switchColumns();
         }
+        transpose();
         randomDraw();
     }
 
@@ -82,7 +85,7 @@ public class Board {
         }
     }
 
-    private boolean isWin() {
+    private boolean isSolvable() {
         int sum = 0;
         for (int i = 0; i < size; i++) {
             for (int j = 0; j < size; j++) {
@@ -94,8 +97,9 @@ public class Board {
             }
         }
         // double check if sum of numbers is correct
-        if (sum == 405) {
-            win = true;
+        if (sum == 405 && size == 9) {
+            return true;
+        } else if(sum == 40 && size == 4){
             return true;
         }
         return false;
@@ -110,21 +114,24 @@ public class Board {
     }
 
     private boolean isValidNumber(int x, int y, int val) {
-        if (getSquare(x, y).getValue() != 0) {
-            return false;
-        }
+//        if (getSquare(x, y).getValue() != 0) {
+//            return false;
+//        }
 
         if (!inColumn(x, y, val)) {
+            System.out.println("Number in Column");
             return false;
         }
 
         // check row
         if (!inRow(x, y, val)) {
+            System.out.println("Number in Row");
             return false;
         }
 
         // check square
         if (!inSquare(x, y, val)) {
+            System.out.println("Number in 3x3");
             return false;
         }
 
@@ -132,13 +139,35 @@ public class Board {
     }
 
     private boolean inSquare(int x, int y, int n) {
-        int row = (int) (Math.floor((y / 3))) * 3;
-        int col = (int) (Math.floor((x / 3))) * 3;
+        if(size==9) {
+            int row = (int) (Math.floor((y / 3))) * 3;
+            int col = (int) (Math.floor((x / 3))) * 3;
 
-        for (int i = row; i < row + 3; i++) {
-            for (int j = col; j < col + 3; j++) {
-                if (getSquare(j, i).getValue() == n)
-                    return false;
+            for (int i = row; i < row + 3; i++) {
+                for (int j = col; j < col + 3; j++) {
+                    if(getSquare(j,i).getPrefilled()) {
+                        if (getSquare(j, i).getValue() == n)
+                            return false;
+                    }else{
+                        if(getSquare(j, i).getUserValue() == n)
+                            return false;
+                    }
+                }
+            }
+        } else if(size == 4){
+            int row = (int) (Math.floor((y / 2))) * 2;
+            int col = (int) (Math.floor((x / 2))) * 2;
+
+            for (int i = row; i < row + 2; i++) {
+                for (int j = col; j < col + 2; j++) {
+                    if(getSquare(j,i).getPrefilled()) {
+                        if (getSquare(j, i).getValue() == n)
+                            return false;
+                    }else{
+                        if(getSquare(j, i).getUserValue() == n)
+                            return false;
+                    }
+                }
             }
         }
         return true;
@@ -147,8 +176,12 @@ public class Board {
     // Checks if number is in row
     private boolean inColumn(int x, int y, int n) {
         for (int row = 0; row < size; row++) {
-            if (getSquare(x, row).getValue() == n) {
-                return false;
+            if(getSquare(x,row).getPrefilled()) {
+                if (getSquare(x, row).getValue() == n)
+                    return false;
+            }else{
+                if(getSquare(x , row).getUserValue() == n)
+                    return false;
             }
         }
         return true;
@@ -157,14 +190,18 @@ public class Board {
     // Checks if number is in column
     private boolean inRow(int x, int y, int n) {
         for (int col = 0; col < size; col++) {
-            if (getSquare(col, y).getValue() == n) {
-                return false;
+            if(getSquare(col,y).getPrefilled()) {
+                if (getSquare(col, y).getValue() == n)
+                    return false;
+            }else{
+                if(getSquare(col, y).getUserValue() == n)
+                    return false;
             }
         }
         return true;
     }
 
-  public  void printGrid() {
+    public  void printGrid() {
         System.out.println("\n+===+===+===+===+===+===+===+===+===+");
         for (int i = 0; i < size; i++) {
             System.out.print("|");
@@ -175,6 +212,28 @@ public class Board {
                 } else {
                     System.out
                             .print(" " + ((getSquare(j, i).getValue() == 0) ? " " : getSquare(j, i).getValue()) + " |");
+                }
+            }
+            if (i % 3 == 2) {
+                System.out.println("\n+===+===+===+===+===+===+===+===+===+");
+
+            } else {
+                System.out.println("\n+---+---+---+---+---+---+---+---+---+");
+            }
+        }
+    }
+
+    public  void printUserGrid() {
+        System.out.println("\n+===+===+===+===+===+===+===+===+===+");
+        for (int i = 0; i < size; i++) {
+            System.out.print("|");
+            for (int j = 0; j < size; j++) {
+                if (j % 3 == 2) {
+                    System.out
+                            .print(" " + ((getSquare(j, i).getUserValue() == 0) ? " " : getSquare(j, i).getUserValue()) + " !");
+                } else {
+                    System.out
+                            .print(" " + ((getSquare(j, i).getUserValue() == 0) ? " " : getSquare(j, i).getUserValue()) + " |");
                 }
             }
             if (i % 3 == 2) {
@@ -204,6 +263,7 @@ public class Board {
         Random rand = new Random();
         int row = rand.nextInt(size);
         int newRow = getSubgrid(row);
+
         int[] temp = new int[size];
         for (int i = 0; i < temp.length; i++) {
             temp[i] = getSquare(i, row).getValue();
@@ -228,30 +288,53 @@ public class Board {
             getSquare(newCol, i).setValue(temp[i]);
         }
     }
+
+    private void transpose(){
+        for(int i = 0 ; i < size ; i++){
+            for( int j = i; j < size; j++){
+               int temp =  getSquare(i,j).getValue();
+               getSquare(i,j).setValue(getSquare(j,i).getValue());
+               getSquare(j,i).setValue(temp);
+            }
+        }
+    }
+
     //Inserts zero to delete a number
     public void insertZero(int x, int y){
         if(!getSquare(x,y).getPrefilled()) {
             getSquare(x,y).setDraw(false);
-        } else{
-            isPrefilled = true;
+            getSquare(x,y).insertUserValue(0);
         }
+    }
+
+    public void isWin(){
+        for(int i = 0; i < size; i++){
+            for(int j = 0; j < size; j++){
+                if(!getSquare(i,j).getPrefilled() && (getSquare(i,j).getUserValue() != getSquare(i,j).getValue())) {
+                    win = false;
+                    return;
+                }
+            }
+        }
+        win = true;
     }
 
     public void insertNumber(int x, int y, int n) {
         // check if valid number
-        if (getSquare(x,y).getUserValue()==0) {
+        if (getSquare(x,y).getUserValue()==0 && !getSquare(x, y).getPrefilled() && isValidNumber(x, y, n)) {
             System.out.println("Valid number, inserting " + n);
             getSquare(x, y).insertUserValue(n);
             getSquare(x, y).setDraw(true);
             isWin();
         }
+        printUserGrid();
 
     }
 
     private void randomDraw(){
         Random rand = new Random();
 
-        for(int i = 0; i < 50; i++){
+        for(int i = 0; i < numberToFill; i++){
             int x = rand.nextInt(9);
             int y = rand.nextInt(9);
             if(getSquare(x, y).getDraw()){
@@ -260,6 +343,15 @@ public class Board {
             }
             else{
                 i--;
+            }
+        }
+    }
+
+    public void solveBoard(){
+        for(int i = 0; i < size; i++){
+            for(int j = 0; j < size; j++){
+                getSquare(i,j).insertUserValue(getSquare(i,j).getValue());
+                getSquare(i,j).setDraw(true);
             }
         }
     }
