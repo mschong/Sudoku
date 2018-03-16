@@ -37,7 +37,7 @@ import edu.utep.cs.cs4330.sudoku.model.Board;
  *  }
  * </pre>
  *
- * @author Yoonsik Cheon, Marina Chong, Jessica Dozal
+ * @author Yoonsik Cheon, Marina Chong, Ana Garcia
  */
 public class MainActivity extends AppCompatActivity {
 

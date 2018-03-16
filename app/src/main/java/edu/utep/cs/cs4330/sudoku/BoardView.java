@@ -20,7 +20,7 @@ import edu.utep.cs.cs4330.sudoku.model.Board;
  * the <code>onDraw()</code> method.
  *
  * @see edu.utep.cs.cs4330.sudoku.model.Board
- * @author Dr. Yoonsik Cheon, Marina Chong, Jessica Dozal
+ * @author Dr. Yoonsik Cheon, Marina Chong, Ana Garcia
  */
 public class BoardView extends View {
 
