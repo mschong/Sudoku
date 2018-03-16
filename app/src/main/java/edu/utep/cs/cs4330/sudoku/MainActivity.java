@@ -63,7 +63,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        board = new Board(4);
+        board = new Board(9);
         boardView = findViewById(R.id.boardView);
         boardView.setBoard(board);
         boardView.addSelectionListener(this::squareSelected);
@@ -88,7 +88,9 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
                 //Restart Activity
-                recreate();
+                //recreate();
+                Intent intent = new Intent(MainActivity.this, Menu.class);
+                startActivity(intent);
             }
         });
         alertDialogBuilder.setNegativeButton("No", new DialogInterface.OnClickListener() {
@@ -109,7 +111,8 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
                 //Restart Activity
-                board.solveBoard();
+                SudokuSolver solver = new SudokuSolver(board);
+                solver.solve();
                 boardView.postInvalidate();
             }
         });

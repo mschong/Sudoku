@@ -346,15 +346,15 @@ public class Board {
             }
         }
     }
-
-    public void solveBoard(){
-        for(int i = 0; i < size; i++){
-            for(int j = 0; j < size; j++){
-                getSquare(i,j).insertUserValue(getSquare(i,j).getValue());
-                getSquare(i,j).setDraw(true);
-            }
-        }
-    }
+//
+//    public void solveBoard(){
+//        for(int i = 0; i < size; i++){
+//            for(int j = 0; j < size; j++){
+//                getSquare(i,j).insertUserValue(getSquare(i,j).getValue());
+//                getSquare(i,j).setDraw(true);
+//            }
+//        }
+//    }
 
     /** Return the size of this board. */
     public int size() {
