@@ -246,16 +246,16 @@ public class Board {
     }
 
     private int getSubgrid(int n) {
-        int coord = (int) (Math.floor((n / 3))) * 3;
-        int[] coords = new int[2];
-        for (int i = coord, j = 0; i <= coord + 2; i++) {
+        int coord = (int) (Math.floor((n / ((int)Math.sqrt(size))))) * ((int)Math.sqrt(size));
+        int[] coords = new int[(int)Math.sqrt(size)-1];
+        for (int i = coord, j = 0; i <= coord + (Math.sqrt(size)-1); i++) {
             if (i != n) {
                 coords[j] = i;
                 j++;
             }
         }
         Random rand = new Random();
-        return coords[rand.nextInt(2)];
+        return coords[rand.nextInt((int)Math.sqrt(size)-1)];
 
     }
 
@@ -335,8 +335,8 @@ public class Board {
         Random rand = new Random();
 
         for(int i = 0; i < numberToFill; i++){
-            int x = rand.nextInt(9);
-            int y = rand.nextInt(9);
+            int x = rand.nextInt(size);
+            int y = rand.nextInt(size);
             if(getSquare(x, y).getDraw()){
                 getSquare(x, y).setDraw(false);
                 getSquare(x,y).setPrefilled(false);

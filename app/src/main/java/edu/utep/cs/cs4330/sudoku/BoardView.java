@@ -89,7 +89,7 @@ public class BoardView extends View {
 
     private final Paint textPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     {
-        textPaint.setColor(Color.BLUE);
+        textPaint.setColor(Color.MAGENTA);
         textPaint.setTextSize(50);
     }
 
@@ -225,8 +225,8 @@ public class BoardView extends View {
 
     /** Draw all the squares (numbers) of the associated board. */
     private void drawSquares(Canvas canvas) {
-        int gridSpacing = getHeight()/ 9;
-        int boardSize = 9 * gridSpacing;
+        int gridSpacing = getHeight()/ board.size;
+        int boardSize = board.size * gridSpacing;
 
         int startX = (getWidth() - boardSize)/(getWidth()/2);
         int startY = (getHeight() - boardSize)/(getHeight()/2);
