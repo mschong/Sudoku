@@ -95,9 +95,9 @@ public class BoardView extends View {
 
     private final Paint squareSelectionPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     {
-        squareSelectionPaint.setColor(Color.RED);
+        squareSelectionPaint.setColor(Color.GREEN);
         squareSelectionPaint.setStyle(Paint.Style.STROKE);
-        squareSelectionPaint.setStrokeWidth(3);
+        squareSelectionPaint.setStrokeWidth(7);
     }
 
 
