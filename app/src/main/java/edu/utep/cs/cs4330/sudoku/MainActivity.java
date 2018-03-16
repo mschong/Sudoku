@@ -63,7 +63,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        board = new Board(4);
+        board = new Board(9);
         boardView = findViewById(R.id.boardView);
         boardView.setBoard(board);
         boardView.addSelectionListener(this::squareSelected);
@@ -102,6 +102,28 @@ public class MainActivity extends AppCompatActivity {
         alertDialog.show();
     }
 
+    public void solveClicked(View view){
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+        alertDialogBuilder.setMessage("Are you sure you want to give up?");
+        alertDialogBuilder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                //Restart Activity
+                board.solveBoard();
+                boardView.postInvalidate();
+            }
+        });
+        alertDialogBuilder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                dialogInterface.cancel();
+            }
+        });
+
+        AlertDialog alertDialog = alertDialogBuilder.create();
+        alertDialog.show();
+    }
+
     /** Callback to be invoked when a number button is tapped.
      *
      * @param n Number represented by the tapped button
@@ -112,42 +134,21 @@ public class MainActivity extends AppCompatActivity {
         if(n==0 && board.getSquare(squareX,squareY).getUserValue()!=0){
             board.insertZero(squareX,squareY);
             board.getSquare(squareX,squareY).setDraw(false);
-            if(board.isPrefilled)
-                toast("Can't delete prefilled value");
             boardView.postInvalidate();
         }else if(board.getSquare(squareX,squareY).getUserValue()==0 && n!=0){
             board.insertNumber(squareX, squareY, n);
             //if game is won, display winning message
-//            if(board.win){
-//                boardView.win = true;
-//                toast("YOU WIN!");
-//            }
+            if(board.win){
+                boardView.win = true;
+                toast("YOU WIN!");
+            }
             boardView.postInvalidate();
-        } else{
-            toast("Space is taken.");
+        }else{
+            if(board.getSquare(squareX,squareY).getPrefilled())
+                toast("Can't delete prefilled value");
+            else
+                toast("Space is taken.");
         }
-
-//
-//        if(board.getSquare(squareX,squareY).getValue() == 0){
-//            board.insertNumber(squareX, squareY, n);
-//            //if game is won, display winning message
-//            if(board.win){
-//                boardView.win = true;
-//                toast("YOU WIN!");
-//            }
-//            boardView.postInvalidate();
-//            //Delete a number that is not from the prefilled
-//        } else if(board.getSquare(squareX,squareY).getValue() != 0 && n==0){
-//            board.insertZero(squareX,squareY);
-//            if(board.isPrefilled)
-//                toast("Can't delete prefilled value");
-//            boardView.postInvalidate();
-//        }
-//        else{
-//            //Can't enter a number where there is a number already
-//            toast("Space is taken.");
-//        }
-//       // toast("Number clicked: " + n);
     }
 
     /**
@@ -158,16 +159,18 @@ public class MainActivity extends AppCompatActivity {
      */
     private void squareSelected(int x, int y) {
         //Get coordinates of square
-        squareX = y;
-        squareY = x;
-        /*Update selected x,y coordinates in BoardView
+        squareX = x;
+        squareY = y;
+
+          /*Update selected x,y coordinates in BoardView
         to draw a red border around the selected cell.
          */
         boardView.setSelectedX(x);
         boardView.setSelectedY(y);
         //force the screen to redraw upon selection
         boardView.postInvalidate();
-        toast(String.format("Square selected: (%d, %d)", y, x));
+
+        toast(String.format("Square selected: (%d, %d)", x, y));
     }
 
     /** Show a toast message. */
