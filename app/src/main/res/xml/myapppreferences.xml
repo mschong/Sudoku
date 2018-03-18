@@ -2,18 +2,28 @@
 <PreferenceScreen
     xmlns:android="http://schemas.android.com/apk/res/android">
     <PreferenceCategory android:title="Board Size">
-        <ListPreference
-            android:title="Select Board Size"
-            android:key="boardSizePref"
-            android:defaultValue="9"
-            android:entries="@array/boardSizeList"/>
+        <CheckBoxPreference
+            android:title="9x9"
+            android:defaultValue="false"
+            android:summary="Select 9x9 Sudoku"
+            android:key="sizePref9" />
+        <CheckBoxPreference
+            android:title="4x4"
+            android:defaultValue="false"
+            android:summary="Select 4x4 Sudoku"
+            android:key="sizePref4" />
     </PreferenceCategory>
 
     <PreferenceCategory android:title="Difficulty">
-        <ListPreference
-            android:title="Select Difficulty"
-            android:key="difficultyPref"
-            android:defaultValue="Easy"
-            android:entries="@array/difficultyList"/>
+        <CheckBoxPreference
+            android:title="Easy"
+            android:key="easyPref" />
+        <CheckBoxPreference
+            android:title="Medium"
+            android:key="mediumPref" />
+        <CheckBoxPreference
+            android:title="Hard"
+            android:key="hardPref" />
+
     </PreferenceCategory>
 </PreferenceScreen>
