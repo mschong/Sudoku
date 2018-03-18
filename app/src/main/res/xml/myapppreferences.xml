@@ -1,29 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen
     xmlns:android="http://schemas.android.com/apk/res/android">
-    <PreferenceCategory android:title="Board Size">
-        <CheckBoxPreference
-            android:title="9x9"
-            android:defaultValue="false"
-            android:summary="Select 9x9 Sudoku"
-            android:key="sizePref9" />
-        <CheckBoxPreference
-            android:title="4x4"
-            android:defaultValue="false"
-            android:summary="Select 4x4 Sudoku"
-            android:key="sizePref4" />
-    </PreferenceCategory>
 
-    <PreferenceCategory android:title="Difficulty">
-        <CheckBoxPreference
-            android:title="Easy"
-            android:key="easyPref" />
-        <CheckBoxPreference
-            android:title="Medium"
-            android:key="mediumPref" />
-        <CheckBoxPreference
-            android:title="Hard"
-            android:key="hardPref" />
+    <ListPreference
+        android:title="Board Size"
+        android:summary="Select the size of the Sudoku board"
+        android:key="boardSizePref"
+        android:defaultValue="9"
+        android:entries="@array/boardSizeArray"
+        android:entryValues="@array/boardSizeValues" />
 
-    </PreferenceCategory>
+    <ListPreference
+        android:title="Game Difficulty"
+        android:summary="Choose your Sudoku Challenge"
+        android:key="gameDifficultyPref"
+        android:defaultValue="9"
+        android:entries="@array/gameDifficultyArray"
+        android:entryValues="@array/gameDifficultyValues" />
+
+
+
+
+
+
 </PreferenceScreen>
