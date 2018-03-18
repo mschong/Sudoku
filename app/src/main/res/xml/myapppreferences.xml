@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen
+    xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory android:title="Board Size">
+        <ListPreference
+            android:title="Select Board Size"
+            android:key="boardSizePref"
+            android:defaultValue="9"
+            android:entries="@array/boardSizeList"/>
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="Difficulty">
+        <ListPreference
+            android:title="Select Difficulty"
+            android:key="difficultyPref"
+            android:defaultValue="Easy"
+            android:entries="@array/difficultyList"/>
+    </PreferenceCategory>
+</PreferenceScreen>
