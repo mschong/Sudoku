@@ -5,18 +5,13 @@ import android.preference.PreferenceActivity;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 
-import java.util.List;
-
 public class AppPreferenceActivity extends PreferenceActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        getFragmentManager().beginTransaction().replace(android.R.id.content, new PrefFragment()).commit();
 
-    }
-   @Override
-   public void onBuildHeaders(List<Header> target) {
-        loadHeadersFromResource(R.xml.prefheaders, target);
     }
 
     @Override
@@ -31,6 +26,9 @@ public class AppPreferenceActivity extends PreferenceActivity {
                     R.xml.myapppreferences, false);
             // Load the preferences from an XML resource
             addPreferencesFromResource(R.xml.myapppreferences);
+
+        }
         }
     }
-}
+
+
