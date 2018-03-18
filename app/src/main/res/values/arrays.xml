@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <integer-array name="boardSizeList">
+        <item>4</item>
+        <item>9</item>
+    </integer-array>
+
+    <string-array name="difficultyList">
+        <item>easy</item>
+        <item>medium</item>
+        <item>hard</item>
+    </string-array>
+</resources>
