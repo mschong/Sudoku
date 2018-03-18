@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="boardSizeArray">
+        <item>9x9</item>
+        <item>4x4</item>
+    </string-array>
+
+    <string-array name="boardSizeValues">
+        <item>9</item>
+        <item>4</item>
+    </string-array>
+
+    <string-array name="gameDifficultyArray">
+        <item>Easy</item>
+        <item>Medium</item>
+        <item>Hard</item>
+    </string-array>
+
+    <string-array name="gameDifficultyValues">
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+    </string-array>
+</resources>
