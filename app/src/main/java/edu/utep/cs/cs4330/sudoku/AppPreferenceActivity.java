@@ -14,7 +14,7 @@ public class AppPreferenceActivity extends PreferenceActivity {
         getFragmentManager().beginTransaction().replace(android.R.id.content, new PrefFragment()).commit();
 
     }
-
+    @Override
     public void onBackPressed(){
         super.onBackPressed();
         this.finish();

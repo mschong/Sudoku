@@ -4,5 +4,6 @@
     <string name="settings_name">Settings</string>
     <string name="solve_name">Solve</string>
     <string name="check_name">Check: Off</string>
+    <string name="board_size">Board Size</string>
     <string name="boardSizePref">Board Size</string>
 </resources>

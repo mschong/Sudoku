@@ -9,14 +9,15 @@ public class Board {
 
     /** Size of this board (number of columns/rows). */
     public final int size;
-    public final int difficulty = 1; //easy; default
+    public  int difficulty; //easy; default
     public ArrayList<Square> grid = new ArrayList<>();
     public boolean win, inSq, inCol, inRw, check=false;
     public int numberToFill;
 
     /** Create a new board of the given size. */
-    public Board(int size) {
+    public Board(int size, int difficulty) {
         this.size = size;
+        this.difficulty = difficulty;
         this.numberToFill = computeNumberOfPreFills();
         initializeGrid();
         fillBoard();
@@ -24,21 +25,26 @@ public class Board {
 
     }
 
+
     private int computeNumberOfPreFills() {
         if(this.size == 9){ //9x9 puzzle
             switch(this.difficulty){
                 case 1: //easy
-                    return (size*size)-32; // pre fill 17 squares
+                    return (size*size)-30; // pre fill 17 squares
                 case 2: //medium
-                    return (size*size)-17;
+                    return (size*size)-25;
+                case 3://hard
+                    return (size*size)-20;
             }
         }
         if(this.size == 4){ //4x4 puzzle
             switch(this.difficulty){
                 case 1: //easy
-                    return 6; //pre fill 6 squares
+                    return (size*size)-6; //pre fill 6 squares
                 case 2: //medium
-                    return 4;
+                    return (size*size)-5;
+                case 3://hard
+                    return (size*size)-4;
             }
         }
         return 1;

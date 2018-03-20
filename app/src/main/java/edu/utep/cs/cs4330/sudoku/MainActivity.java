@@ -1,5 +1,6 @@
 package edu.utep.cs.cs4330.sudoku;
 
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -14,6 +15,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -60,14 +62,15 @@ public class MainActivity extends AppCompatActivity {
     private int squareX;
     private int squareY;
     SharedPreferences sp;
+    public int size = 9;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        sp = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
-        int size = Integer.parseInt(sp.getString("boardSizePref","9"));
-        board = new Board(size);
+//        sp = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+//        int size = Integer.parseInt(sp.getString("boardSizePref","4"));
+        board = new Board(size,1);
         boardView = findViewById(R.id.boardView);
         boardView.setBoard(board);
         boardView.addSelectionListener(this::squareSelected);
@@ -79,15 +82,20 @@ public class MainActivity extends AppCompatActivity {
             numberButtons.add(button);
             setButtonWidth(button);
         }
-
     }
 
-    @Override
-    public void onResume() {
-        super.onResume();
-        int size = Integer.parseInt(sp.getString("boardSizePref","9"));
-        System.out.println("Size: "+ size);
+    public void enableButtons(){
+        if(size == 4){
+            for (int i = 5 ; i < numberIds.length; i++){
+                View button = findViewById(numberIds[i]);
+                button.setEnabled(false);
+            }
+        }
     }
+
+    
+
+
 
     //create the 3 dots
     @Override
@@ -102,12 +110,12 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         //Settings menu item
-        if( id == R.id.action_settings){
-            Intent i = new Intent(MainActivity.this, AppPreferenceActivity.class);
-            startActivity(i);
-        }
+//        if( id == R.id.action_settings){
+//            Intent i = new Intent(MainActivity.this, AppPreferenceActivity.class);
+//            startActivity(i);
+//        }
         //Solve menu item
-        else if(id == R.id.action_solve){
+        if(id == R.id.action_solve){
             AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
             alertDialogBuilder.setMessage("Are you sure you want to give up?");
             alertDialogBuilder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
@@ -138,6 +146,66 @@ public class MainActivity extends AppCompatActivity {
                 item.setTitle("Check: On");
                 board.check = true;
                 boardView.postInvalidate();
+            }
+        }
+        else if(id == R.id.small){
+            if(item.isChecked()){
+                item.setChecked(true);
+            }else{
+                board = new Board(4,1);
+                size = 4;
+                boardView = findViewById(R.id.boardView);
+                boardView.setBoard(board);
+                enableButtons();
+                boardView.postInvalidate();
+                item.setChecked(false);
+            }
+        }
+        else if(id == R.id.large){
+            if(item.isChecked()){
+                item.setChecked(true);
+            }else{
+                board = new Board(9,1);
+                size = 9;
+                boardView = findViewById(R.id.boardView);
+                boardView.setBoard(board);
+                boardView.postInvalidate();
+                item.setChecked(false);
+            }
+        }
+        else if(id == R.id.easy){
+            if(item.isChecked()){
+                item.setChecked(true);
+            }else{
+                board = new Board(size, 1);
+                boardView = findViewById(R.id.boardView);
+                boardView.setBoard(board);;
+                boardView.postInvalidate();
+                boardView.postInvalidate();
+                item.setChecked(false);
+            }
+        }
+        else if(id == R.id.medium){
+            if(item.isChecked()){
+                item.setChecked(true);
+            }else{
+                board = new Board(size, 2);
+                boardView = findViewById(R.id.boardView);
+                boardView.setBoard(board);;
+                boardView.postInvalidate();
+                boardView.postInvalidate();
+                item.setChecked(false);
+            }
+        }
+        else if(id == R.id.hard){
+            if(item.isChecked()){
+                item.setChecked(true);
+            }else{
+                board = new Board(size, 3);
+                boardView = findViewById(R.id.boardView);
+                boardView.setBoard(board);;
+                boardView.postInvalidate();
+                item.setChecked(false);
             }
         }
 

@@ -6,7 +6,7 @@
         android:title="Board Size"
         android:summary="Select the size of the Sudoku board"
         android:key="@string/boardSizePref"
-        android:defaultValue="9"
+        android:defaultValue="4"
         android:entries="@array/boardSizeArray"
         android:entryValues="@array/boardSizeValues" />
 

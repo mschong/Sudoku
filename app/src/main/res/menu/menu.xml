@@ -2,11 +2,46 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
-        android:id="@+id/action_settings"
-        android:title="@string/settings_name"
-        app:showAsAction="never"
-        >
+        android:id="@+id/settings"
+        android:title="Settings"
 
+        >
+        <menu>
+            <item android:id="@+id/board_size"
+                android:title="Select Board Size">
+                <menu>
+                    <item
+                        android:id="@+id/small"
+                        android:checkable="true"
+                        android:title="4x4"></item>
+                    <item
+                        android:id="@+id/large"
+                        android:checkable="true"
+                        android:title="9x9"></item>
+                </menu>
+            </item>
+
+                    <item
+                        android:title="Select Difficulty"
+                        android:id="@+id/level">
+                        <menu>
+                            <item
+                                android:id="@+id/easy"
+                                android:checkable="true"
+                                android:title="Easy"></item>
+                            <item
+                                android:id="@+id/medium"
+                                android:checkable="true"
+                                android:title="Medium"></item>
+                            <item
+                                android:id="@+id/hard"
+                                android:checkable="true"
+                                android:title="Hard"></item>
+                        </menu>
+                    </item>
+
+
+        </menu>
     </item>
     <item
         android:id="@+id/action_solve"
