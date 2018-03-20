@@ -8,6 +8,17 @@
         >
 
     </item>
+    <item
+        android:id="@+id/action_solve"
+        android:title="@string/solve_name"
+        app:showAsAction="never"
+        >
+    </item>
+    <item
+        android:id="@+id/action_check"
+        android:title="@string/check_name"
+        app:showAsAction="never">
+    </item>
 
 
 </menu>

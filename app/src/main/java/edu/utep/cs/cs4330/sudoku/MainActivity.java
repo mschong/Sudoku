@@ -2,7 +2,11 @@ package edu.utep.cs.cs4330.sudoku;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.preference.ListPreference;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Gravity;
@@ -55,17 +59,18 @@ public class MainActivity extends AppCompatActivity {
 
     private int squareX;
     private int squareY;
+    SharedPreferences sp;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        board = new Board(9);
+        sp = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+        int size = Integer.parseInt(sp.getString("boardSizePref","9"));
+        board = new Board(size);
         boardView = findViewById(R.id.boardView);
         boardView.setBoard(board);
         boardView.addSelectionListener(this::squareSelected);
-
         numberButtons = new ArrayList<>(numberIds.length);
         for (int i = 0; i < numberIds.length; i++) {
             final int number = i; // 0 for delete button
@@ -74,6 +79,14 @@ public class MainActivity extends AppCompatActivity {
             numberButtons.add(button);
             setButtonWidth(button);
         }
+
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        int size = Integer.parseInt(sp.getString("boardSizePref","9"));
+        System.out.println("Size: "+ size);
     }
 
     //create the 3 dots
@@ -88,10 +101,46 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
+        //Settings menu item
         if( id == R.id.action_settings){
             Intent i = new Intent(MainActivity.this, AppPreferenceActivity.class);
             startActivity(i);
         }
+        //Solve menu item
+        else if(id == R.id.action_solve){
+            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+            alertDialogBuilder.setMessage("Are you sure you want to give up?");
+            alertDialogBuilder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    SudokuSolver solver = new SudokuSolver(board);
+                    solver.solve();
+                    boardView.postInvalidate();
+                }
+            });
+            alertDialogBuilder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    dialogInterface.cancel();
+                }
+            });
+
+            AlertDialog alertDialog = alertDialogBuilder.create();
+            alertDialog.show();
+        }
+        //Check menu item
+        else if(id == R.id.action_check){
+            if(board.check) {
+                item.setTitle("Check: Off");
+                board.check = false;
+                boardView.postInvalidate();
+            } else{
+                item.setTitle("Check: On");
+                board.check = true;
+                boardView.postInvalidate();
+            }
+        }
+
 
         return super.onOptionsItemSelected(item);
     }
@@ -106,32 +155,9 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
                 //Restart Activity
-                //recreate();
-                Intent intent = new Intent(MainActivity.this, Menu.class);
-                startActivity(intent);
-            }
-        });
-        alertDialogBuilder.setNegativeButton("No", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                dialogInterface.cancel();
-            }
-        });
-
-        AlertDialog alertDialog = alertDialogBuilder.create();
-        alertDialog.show();
-    }
-
-    public void solveClicked(View view){
-        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
-        alertDialogBuilder.setMessage("Are you sure you want to give up?");
-        alertDialogBuilder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                //Restart Activity
-                SudokuSolver solver = new SudokuSolver(board);
-                solver.solve();
-                boardView.postInvalidate();
+                recreate();
+//                Intent intent = new Intent(MainActivity.this, Menu.class);
+//                startActivity(intent);
             }
         });
         alertDialogBuilder.setNegativeButton("No", new DialogInterface.OnClickListener() {
@@ -158,6 +184,18 @@ public class MainActivity extends AppCompatActivity {
             boardView.postInvalidate();
         }else if(board.getSquare(squareX,squareY).getUserValue()==0 && n!=0){
             board.insertNumber(squareX, squareY, n);
+            if(board.inRw&&!board.getSquare(squareX,squareY).getDraw()){
+                toastWarning("Number already in row");
+                board.inRw = false;
+            }
+            else if(board.inSq&&!board.getSquare(squareX,squareY).getDraw()){
+                toastWarning("Number already in 3x3");
+                board.inSq = false;
+            }
+            else if(board.inCol&&!board.getSquare(squareX,squareY).getDraw()){
+                toastWarning("Number already in column");
+                board.inCol = false;
+            }
             //if game is won, display winning message
             if(board.win){
                 boardView.win = true;
@@ -197,11 +235,19 @@ public class MainActivity extends AppCompatActivity {
     /** Show a toast message. */
     private void toast(String msg) {
         Toast toast=Toast.makeText(this, msg, Toast.LENGTH_SHORT);
-        toast.setGravity(Gravity.TOP,0,130);
+        toast.setGravity(Gravity.TOP,-7,130);
         toast.show();
 
-
     }
+
+    private void toastWarning(String msg) {
+        Toast toast = Toast.makeText(this, msg, Toast.LENGTH_SHORT);
+        toast.setGravity(Gravity.TOP,-7,130);
+        View toastView = toast.getView();
+        toastView.setBackgroundColor(Color.parseColor("#ffb380"));
+        toast.show();
+    }
+
     @Override
     public void onBackPressed() {
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);

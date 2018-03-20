@@ -1,5 +1,6 @@
 package edu.utep.cs.cs4330.sudoku;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceFragment;
@@ -12,6 +13,13 @@ public class AppPreferenceActivity extends PreferenceActivity {
         super.onCreate(savedInstanceState);
         getFragmentManager().beginTransaction().replace(android.R.id.content, new PrefFragment()).commit();
 
+    }
+
+    public void onBackPressed(){
+        super.onBackPressed();
+        this.finish();
+        Intent i = new Intent(getApplicationContext(), MainActivity.class);
+        startActivity(i);
     }
 
     @Override

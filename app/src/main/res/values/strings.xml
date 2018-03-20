@@ -2,4 +2,7 @@
     <string name="app_name">Sudoku</string>
     <string name="title_activity_menu">Menu</string>
     <string name="settings_name">Settings</string>
+    <string name="solve_name">Solve</string>
+    <string name="check_name">Check: Off</string>
+    <string name="boardSizePref">Board Size</string>
 </resources>

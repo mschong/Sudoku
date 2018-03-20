@@ -11,7 +11,7 @@ public class Board {
     public final int size;
     public final int difficulty = 1; //easy; default
     public ArrayList<Square> grid = new ArrayList<>();
-    public boolean win;
+    public boolean win, inSq, inCol, inRw, check=false;
     public int numberToFill;
 
     /** Create a new board of the given size. */
@@ -146,11 +146,17 @@ public class Board {
             for (int i = row; i < row + 3; i++) {
                 for (int j = col; j < col + 3; j++) {
                     if(getSquare(j,i).getPrefilled()) {
-                        if (getSquare(j, i).getValue() == n)
+                        if (getSquare(j, i).getValue() == n) {
+                            System.out.println("InSq is true");
+                            inSq = true;
                             return false;
+                        }
                     }else{
-                        if(getSquare(j, i).getUserValue() == n)
+                        if(getSquare(j, i).getUserValue() == n) {
+                            System.out.println("InSq is true");
+                            inSq = true;
                             return false;
+                        }
                     }
                 }
             }
@@ -164,8 +170,12 @@ public class Board {
                         if (getSquare(j, i).getValue() == n)
                             return false;
                     }else{
-                        if(getSquare(j, i).getUserValue() == n)
+                        System.out.println("Not prefilled");
+                        if(getSquare(j, i).getUserValue() == n) {
+                            System.out.println("InSq is true");
+                            inSq = true;
                             return false;
+                        }
                     }
                 }
             }
@@ -177,11 +187,16 @@ public class Board {
     private boolean inColumn(int x, int y, int n) {
         for (int row = 0; row < size; row++) {
             if(getSquare(x,row).getPrefilled()) {
-                if (getSquare(x, row).getValue() == n)
+                if (getSquare(x, row).getValue() == n) {
+                    inCol = true;
                     return false;
+                }
             }else{
-                if(getSquare(x , row).getUserValue() == n)
+                if(getSquare(x , row).getUserValue() == n) {
+                    System.out.println("InCol is true");
+                    inCol = true;
                     return false;
+                }
             }
         }
         return true;
@@ -191,11 +206,15 @@ public class Board {
     private boolean inRow(int x, int y, int n) {
         for (int col = 0; col < size; col++) {
             if(getSquare(col,y).getPrefilled()) {
-                if (getSquare(col, y).getValue() == n)
+                if (getSquare(col, y).getValue() == n) {
+                    inRw = true;
                     return false;
+                }
             }else{
-                if(getSquare(col, y).getUserValue() == n)
+                if(getSquare(col, y).getUserValue() == n) {
+                    inRw = true;
                     return false;
+                }
             }
         }
         return true;
@@ -346,15 +365,14 @@ public class Board {
             }
         }
     }
-//
-//    public void solveBoard(){
-//        for(int i = 0; i < size; i++){
-//            for(int j = 0; j < size; j++){
-//                getSquare(i,j).insertUserValue(getSquare(i,j).getValue());
-//                getSquare(i,j).setDraw(true);
-//            }
-//        }
-//    }
+
+    public boolean checkNum(int x , int y) {
+        if (getSquare(x, y).getUserValue() != getSquare(x, y).getValue() && !getSquare(x, y).getPrefilled()){
+            return false;
+    }
+        return true;
+    }
+
 
     /** Return the size of this board. */
     public int size() {

@@ -6,8 +6,8 @@
     </string-array>
 
     <string-array name="boardSizeValues">
-        <item>9</item>
-        <item>4</item>
+        <item>"9"</item>
+        <item>"4"</item>
     </string-array>
 
     <string-array name="gameDifficultyArray">

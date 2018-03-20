@@ -89,9 +89,10 @@ public class BoardView extends View {
 
     private final Paint textPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     {
-        textPaint.setColor(Color.MAGENTA);
+        textPaint.setColor(Color.rgb(196, 77, 255));
         textPaint.setTextSize(50);
     }
+
 
     private final Paint squareSelectionPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     {
@@ -233,8 +234,27 @@ public class BoardView extends View {
 
         for(int i = 0;i< board.size; i++){
             for(int j = 0; j<board.size; j++){
+                //Checks if check was selected
+                if(board.check){
+                    //If the user the number entered is incorrect it would be painted reed
+                    if(!board.checkNum(i,j) && board.getSquare(i,j).getUserValue()!=0){
+                        Paint wrongPaint = new Paint();
+                        wrongPaint.setColor(Color.RED);
+                        wrongPaint.setTextSize(50);
+                        canvas.drawText(Integer.toString(board.getSquare(i,j).getUserValue()),(startX + (i+1)*gridSpacing-35)-15,(startY + j*gridSpacing)+55, wrongPaint);
+
+                    }
+                    //If it's a prefilled value then paint it black
+                    else if(board.getSquare(i,j).getDraw() && board.getSquare(i,j).getPrefilled()){
+                        canvas.drawText(Integer.toString(board.getSquare(i,j).getValue()),(startX + (i+1)*gridSpacing-35)-15,(startY + j*gridSpacing)+55,preFilledPaint);
+                    }
+                    //if the number is correct leave it purple
+                    else if(board.getSquare(i,j).getDraw()){
+                        canvas.drawText(Integer.toString(board.getSquare(i,j).getUserValue()),(startX + (i+1)*gridSpacing-35)-15,(startY + j*gridSpacing)+55,textPaint);
+                    }
+                }
                 //Check if it's one of the prefilled values
-                if(board.getSquare(i,j).getDraw() && board.getSquare(i,j).getPrefilled()){
+                else if(board.getSquare(i,j).getDraw() && board.getSquare(i,j).getPrefilled()){
                     canvas.drawText(Integer.toString(board.getSquare(i,j).getValue()),(startX + (i+1)*gridSpacing-35)-15,(startY + j*gridSpacing)+55,preFilledPaint);
                 } else if(board.getSquare(i,j).getDraw()){
                     canvas.drawText(Integer.toString(board.getSquare(i,j).getUserValue()),(startX + (i+1)*gridSpacing-35)-15,(startY + j*gridSpacing)+55,textPaint);
