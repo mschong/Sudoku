@@ -11,7 +11,7 @@ public class Board {
     public final int size;
     public  int difficulty; //easy; default
     public ArrayList<Square> grid = new ArrayList<>();
-    public boolean win, inSq, inCol, inRw, check=false;
+    public boolean win, check=false;
     public int numberToFill;
 
     /** Create a new board of the given size. */
@@ -26,6 +26,7 @@ public class Board {
     }
 
 
+    /**Get number of prefilled numbers depending on the level**/
     private int computeNumberOfPreFills() {
         if(this.size == 9){ //9x9 puzzle
             switch(this.difficulty){
@@ -50,6 +51,7 @@ public class Board {
         return 1;
     }
 
+    /**Create an empty grid**/
     private void initializeGrid() {
         for (int i = 0; i < size; i++) {
             for (int j = 0; j < size; j++) {
@@ -58,6 +60,7 @@ public class Board {
         }
     }
 
+    /**Create a solvable game**/
     private void fillBoard() {
         for (int x = 0; x < size; x++) {
             for (int y = 0; y < size; y++) {
@@ -91,6 +94,7 @@ public class Board {
         }
     }
 
+    /**Check if the created game can be won**/
     private boolean isSolvable() {
         int sum = 0;
         for (int i = 0; i < size; i++) {
@@ -111,6 +115,7 @@ public class Board {
         return false;
     }
 
+    /**Method to access squares inside grid**/
     public Square getSquare(int x, int y) {
         for (int i = 0; i < grid.size(); i++) {
             if (grid.get(i).getXCoord() == x && grid.get(i).getYCoord() == y)
@@ -119,88 +124,56 @@ public class Board {
         return null;
     }
 
+    /**Check if the number selected by the user is valid**/
     public boolean isValidNumber(int x, int y, int val) {
-//        if (getSquare(x, y).getValue() != 0) {
-//            return false;
-//        }
 
         if (!inColumn(x, y, val)) {
-            System.out.println("Number in Column");
             return false;
         }
 
         // check row
         if (!inRow(x, y, val)) {
-            System.out.println("Number in Row");
             return false;
         }
 
         // check square
         if (!inSquare(x, y, val)) {
-            System.out.println("Number in 3x3");
             return false;
         }
 
         return true;
     }
 
+    /**Checks if number is inside the 3x3 grid**/
     private boolean inSquare(int x, int y, int n) {
-        if(size==9) {
-            int row = (int) (Math.floor((y / 3))) * 3;
-            int col = (int) (Math.floor((x / 3))) * 3;
-
-            for (int i = row; i < row + 3; i++) {
-                for (int j = col; j < col + 3; j++) {
+        int boundary = (int)Math.sqrt(size);
+        int row = (int) (Math.floor((y / boundary))) * boundary;
+        int col = (int) (Math.floor((x / boundary))) * boundary;
+            for (int i = row; i < row + boundary; i++) {
+                for (int j = col; j < col + boundary; j++) {
                     if(getSquare(j,i).getPrefilled()) {
                         if (getSquare(j, i).getValue() == n) {
-                            System.out.println("InSq is true");
-                            inSq = true;
                             return false;
                         }
                     }else{
                         if(getSquare(j, i).getUserValue() == n) {
-                            System.out.println("InSq is true");
-                            inSq = true;
                             return false;
                         }
                     }
                 }
             }
-        } else if(size == 4){
-            int row = (int) (Math.floor((y / 2))) * 2;
-            int col = (int) (Math.floor((x / 2))) * 2;
-
-            for (int i = row; i < row + 2; i++) {
-                for (int j = col; j < col + 2; j++) {
-                    if(getSquare(j,i).getPrefilled()) {
-                        if (getSquare(j, i).getValue() == n)
-                            return false;
-                    }else{
-                        System.out.println("Not prefilled");
-                        if(getSquare(j, i).getUserValue() == n) {
-                            System.out.println("InSq is true");
-                            inSq = true;
-                            return false;
-                        }
-                    }
-                }
-            }
-        }
         return true;
     }
 
-    // Checks if number is in row
+    /**Checks if number is in row**/
     private boolean inColumn(int x, int y, int n) {
         for (int row = 0; row < size; row++) {
             if(getSquare(x,row).getPrefilled()) {
                 if (getSquare(x, row).getValue() == n) {
-                    inCol = true;
                     return false;
                 }
             }else{
                 if(getSquare(x , row).getUserValue() == n) {
-                    System.out.println("InCol is true");
-                    inCol = true;
                     return false;
                 }
             }
@@ -208,17 +181,15 @@ public class Board {
         return true;
     }
 
-    // Checks if number is in column
+    /** Checks if number is in column**/
     private boolean inRow(int x, int y, int n) {
         for (int col = 0; col < size; col++) {
             if(getSquare(col,y).getPrefilled()) {
                 if (getSquare(col, y).getValue() == n) {
-                    inRw = true;
                     return false;
                 }
             }else{
                 if(getSquare(col, y).getUserValue() == n) {
-                    inRw = true;
                     return false;
                 }
             }
@@ -249,6 +220,7 @@ public class Board {
     }
 
 
+    /**Get the 3x3 depending on the row or column**/
     private int getSubgrid(int n) {
         int coord = (int) (Math.floor((n / ((int)Math.sqrt(size))))) * ((int)Math.sqrt(size));
         int[] coords = new int[(int)Math.sqrt(size)-1];
@@ -263,6 +235,7 @@ public class Board {
 
     }
 
+    /**Switch random rows within the 3x3 square to create a new solvable game**/
     private void switchRows() {
         Random rand = new Random();
         int row = rand.nextInt(size);
@@ -278,6 +251,7 @@ public class Board {
         }
     }
 
+    /**Switch random columns within the 3x3 square to create a new solvable game**/
     private void switchColumns(){
         Random rand = new Random();
         int col = rand.nextInt(size);
@@ -293,6 +267,7 @@ public class Board {
         }
     }
 
+    /**Transpose grid to always create a different game**/
     private void transpose(){
         for(int i = 0 ; i < size ; i++){
             for( int j = i; j < size; j++){
@@ -303,7 +278,7 @@ public class Board {
         }
     }
 
-    //Inserts zero to delete a number
+    /**Inserts zero to delete a number**/
     public void insertZero(int x, int y){
         if(!getSquare(x,y).getPrefilled()) {
             getSquare(x,y).setDraw(false);
@@ -311,6 +286,7 @@ public class Board {
         }
     }
 
+    /**Check if the game is won**/
     public void isWin(){
         for(int i = 0; i < size; i++){
             for(int j = 0; j < size; j++){
@@ -323,17 +299,17 @@ public class Board {
         win = true;
     }
 
+    /**Insert number in square**/
     public void insertNumber(int x, int y, int n) {
         // check if valid number
         if (getSquare(x,y).getUserValue()==0 && !getSquare(x, y).getPrefilled() && isValidNumber(x, y, n)) {
-            System.out.println("Valid number, inserting " + n);
             getSquare(x, y).insertUserValue(n);
             getSquare(x, y).setDraw(true);
             isWin();
         }
     }
 
-    //Get random squares to draw
+    /**Get random squares to draw**/
     private void randomDraw(){
         Random rand = new Random();
 
@@ -350,7 +326,7 @@ public class Board {
         }
     }
 
-    //Checking if user value is correct
+    /**Checks if user value is correct**/
     public boolean checkNum(int x , int y) {
         if (getSquare(x, y).getUserValue() != getSquare(x, y).getValue() && !getSquare(x, y).getPrefilled()){
             return false;
@@ -359,6 +335,7 @@ public class Board {
     }
 
 
+    /**Gets the permitted numbers per square**/
     public ArrayList<Integer> permittedNums(int x, int y){
         ArrayList<Integer> nums = new ArrayList<>();
         for(int i = 1; i <= size; i++){
@@ -366,10 +343,7 @@ public class Board {
                 nums.add(i);
             }
         }
-        System.out.println("Permitted numbers:");
-        for(int i: nums){
-            System.out.println(i);
-        }
+
         return nums;
     }
 

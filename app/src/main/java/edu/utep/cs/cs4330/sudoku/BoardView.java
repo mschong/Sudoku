@@ -81,22 +81,11 @@ public class BoardView extends View {
         blackPaint.setStrokeWidth(7);
     }
 
-    private final Paint preFilledPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-    {
-        preFilledPaint.setColor(Color.BLACK);
-        preFilledPaint.setTextSize(50);
-    }
-
-    private final Paint textPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-    {
-        textPaint.setColor(Color.rgb(196, 77, 255));
-        textPaint.setTextSize(50);
-    }
 
 
     private final Paint squareSelectionPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     {
-        squareSelectionPaint.setColor(Color.CYAN);
+        squareSelectionPaint.setColor(Color.rgb(204, 204, 255));
         squareSelectionPaint.setStyle(Paint.Style.STROKE);
         squareSelectionPaint.setStrokeWidth(7);
     }
@@ -157,17 +146,18 @@ public class BoardView extends View {
 
     /** Draw horizontal and vertical grid lines. */
     private void drawGrid(Canvas canvas) {
-        System.out.println("in drawGrid");
         final float maxCoord = maxCoord();
         if(!board.win)
             canvas.drawRect(0, 0, maxCoord, maxCoord, boardPaint);
         else
             canvas.drawRect(0, 0, maxCoord, maxCoord, winBoardPaint);
-
+        Paint blackPaint2 = new Paint();
+        blackPaint2.setColor(Color.BLACK);
+        blackPaint2.setStrokeWidth(15);
         //Top Line
-        canvas.drawLine(0,0,maxCoord,0, blackPaint);
+        canvas.drawLine(0,0,maxCoord,0, blackPaint2);
         //Bottom Line
-        canvas.drawLine(0,maxCoord,maxCoord,maxCoord, blackPaint);
+        canvas.drawLine(0,maxCoord,maxCoord,maxCoord, blackPaint2);
         //Left Line
         canvas.drawLine(0, maxCoord, 0,0, blackPaint);
         //Right Line
@@ -231,70 +221,102 @@ public class BoardView extends View {
 
         int startX = (getWidth() - boardSize)/(getWidth()/2);
         int startY = (getHeight() - boardSize)/(getHeight()/2);
+        Paint wrongPaint = new Paint();
+        wrongPaint.setColor(Color.RED);
 
-        for(int i = 0;i< board.size; i++){
-            for(int j = 0; j<board.size; j++){
-                //Checks if check was selected
-                if(board.check){
-                    //If the user the number entered is incorrect it would be painted reed
-                    if(!board.checkNum(i,j) && board.getSquare(i,j).getUserValue()!=0){
-                        Paint wrongPaint = new Paint();
-                        wrongPaint.setColor(Color.RED);
-                        wrongPaint.setTextSize(50);
-                        canvas.drawText(Integer.toString(board.getSquare(i,j).getUserValue()),(startX + (i+1)*gridSpacing-35)-15,(startY + j*gridSpacing)+55, wrongPaint);
+        if(board.size==9) {
+            for (int i = 0; i < board.size; i++) {
+                for (int j = 0; j < board.size; j++) {
+                    //Checks if check was selected
+                    if (board.check) {
+                        //If the user the number entered is incorrect it would be painted reed
+                        if (!board.checkNum(i, j) && board.getSquare(i, j).getUserValue() != 0) {
+                            wrongPaint.setTextSize(50);
+                            canvas.drawText(Integer.toString(board.getSquare(i, j).getUserValue()), (startX + (i + 1) * gridSpacing - 35) - 15, (startY + j * gridSpacing) + 55, wrongPaint);
 
-                    }
-                    //If it's a prefilled value then paint it black
-                    else if(board.getSquare(i,j).getDraw() && board.getSquare(i,j).getPrefilled()){
-                        canvas.drawText(Integer.toString(board.getSquare(i,j).getValue()),(startX + (i+1)*gridSpacing-35)-15,(startY + j*gridSpacing)+55,preFilledPaint);
-                    }
-                    //if the number is correct leave it purple
-                    else if(board.getSquare(i,j).getDraw()){
-                        canvas.drawText(Integer.toString(board.getSquare(i,j).getUserValue()),(startX + (i+1)*gridSpacing-35)-15,(startY + j*gridSpacing)+55,textPaint);
-                    }
-                    else{
-                        Paint numPaint = new Paint();
-                        numPaint.setColor(Color.BLACK);
-                        numPaint.setTextSize(15);
-                        for(int num = 0; num < board.permittedNums(i,j).size(); num++){
-                            canvas.drawText(Integer.toString(board.permittedNums(i,j).get(num)), (startX + (i + 1) * gridSpacing - 35) -(34-(num*9)), (startY + j * gridSpacing) + 68, numPaint);
-                        }
-                    }
+                        } else
+                            drawNumbers(canvas, gridSpacing, startX, startY, i, j);
+                    } else
+                        drawNumbers(canvas, gridSpacing, startX, startY, i, j);
                 }
-                //Check if it's one of the prefilled values
-                else if(board.getSquare(i,j).getDraw() && board.getSquare(i,j).getPrefilled()){
-                    canvas.drawText(Integer.toString(board.getSquare(i,j).getValue()),(startX + (i+1)*gridSpacing-35)-15,(startY + j*gridSpacing)+55,preFilledPaint);
-                }
-                else if(board.getSquare(i,j).getDraw()) {
-                    canvas.drawText(Integer.toString(board.getSquare(i, j).getUserValue()), (startX + (i + 1) * gridSpacing - 35) - 15, (startY + j * gridSpacing) + 55, textPaint);
-
-                } else{
-                    Paint numPaint = new Paint();
-                    numPaint.setColor(Color.BLACK);
-                    numPaint.setTextSize(15);
-                    for(int num = 0; num < board.permittedNums(i,j).size(); num++){
-                        canvas.drawText(Integer.toString(board.permittedNums(i,j).get(num)), (startX + (i + 1) * gridSpacing - 35) -(34-(num*9)), (startY + j * gridSpacing) + 68, numPaint);
-                    }
+            }
+        }else if(board.size==4) {
+            for (int i = 0; i < board.size; i++) {
+                for (int j = 0; j < board.size; j++) {
+                    //Checks if check was selected
+                    if (board.check) {
+                        //If the user the number entered is incorrect it would be painted reed
+                        if (!board.checkNum(i, j) && board.getSquare(i, j).getUserValue() != 0) {
+                            wrongPaint.setTextSize(105);
+                            canvas.drawText(Integer.toString(board.getSquare(i, j).getUserValue()), (startX + (i + 1) * gridSpacing)-110, (startY + j * gridSpacing)+120, wrongPaint);
+                        } else
+                            drawNumbers(canvas, gridSpacing, startX, startY, i, j);
+                    } else
+                        drawNumbers(canvas, gridSpacing, startX, startY, i, j);
                 }
             }
         }
-
-
     }
+
+    private void drawNumbers(Canvas canvas, int gridSpacing, int startX, int startY, int i, int j){
+        Paint numPaint = new Paint();
+        Paint preFilledPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        Paint textPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        textPaint.setColor(Color.rgb(196, 77, 255));
+        preFilledPaint.setColor(Color.BLACK);
+
+        //Draw prefilled values
+        if(board.size==9) {
+            textPaint.setTextSize(50);
+            preFilledPaint.setTextSize(50);
+            numPaint.setColor(Color.BLACK);
+            if (board.getSquare(i, j).getDraw() && board.getSquare(i, j).getPrefilled()) {
+                canvas.drawText(Integer.toString(board.getSquare(i, j).getValue()), (startX + (i + 1) * gridSpacing - 35) - 15, (startY + j * gridSpacing) + 55, preFilledPaint);
+            }
+            //Draw user values
+            else if (board.getSquare(i, j).getDraw()) {
+                canvas.drawText(Integer.toString(board.getSquare(i, j).getUserValue()), (startX + (i + 1) * gridSpacing - 35) - 15, (startY + j * gridSpacing) + 55, textPaint);
+            }
+            //Draw permitted numbers
+            else {
+                numPaint.setTextSize(15);
+                for (int num = 0; num < board.permittedNums(i, j).size(); num++) {
+                    canvas.drawText(Integer.toString(board.permittedNums(i, j).get(num)), (startX + (i + 1) * gridSpacing - 35) - (32 - (num * 9)), (startY + j * gridSpacing) + 68, numPaint);
+                }
+            }
+        }else {
+            textPaint.setTextSize(105);
+            preFilledPaint.setTextSize(105);
+            if (board.getSquare(i, j).getDraw() && board.getSquare(i, j).getPrefilled()) {
+                canvas.drawText(Integer.toString(board.getSquare(i, j).getValue()), (startX + (i + 1) * gridSpacing)-110, (startY + j * gridSpacing)+120, preFilledPaint);
+            }
+            //Draw user values
+            else if (board.getSquare(i, j).getDraw()) {
+                canvas.drawText(Integer.toString(board.getSquare(i, j).getUserValue()), (startX + (i + 1) * gridSpacing)-110, (startY + j * gridSpacing)+120, textPaint);
+            }
+            //Draw permitted numbers
+            else {
+                numPaint.setTextSize(30);
+                numPaint.setColor(Color.rgb(128, 128, 128));
+                for (int num = 0; num < board.permittedNums(i, j).size(); num++) {
+                    canvas.drawText(Integer.toString(board.permittedNums(i, j).get(num)), (startX + (i + 1) * gridSpacing-80) - (75-(num * 20)), (startY + j * gridSpacing) + 160, numPaint);
+                }
+            }
+        }
+    }
+
 
     /**Draws a red border around the cell the user selected**/
     private void drawSelection(Canvas canvas){
         //the difference between board size and the selected x-coordinate
         float diff = maxCoord() /(float)boardSize;
         if(selectedX != -1 && selectedY != -1){
-            System.out.println("Selected X: " + selectedX);
-            System.out.println("Selected Y: " + selectedY);
 
             if(board.getSquare(selectedX,selectedY).getPrefilled()){
                 squareSelectionPaint.setColor(Color.BLUE);
                 canvas.drawRect(selectedX*diff,selectedY*diff,selectedX*diff+diff,selectedY*diff+diff,squareSelectionPaint);
             }else {
-                squareSelectionPaint.setColor(Color.CYAN);
+                squareSelectionPaint.setColor(Color.rgb(0, 204, 255));
                 canvas.drawRect(selectedX * diff, selectedY * diff, selectedX * diff + diff, selectedY * diff + diff, squareSelectionPaint);
             }
         }

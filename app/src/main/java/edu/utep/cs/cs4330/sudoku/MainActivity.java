@@ -61,15 +61,12 @@ public class MainActivity extends AppCompatActivity {
 
     private int squareX;
     private int squareY;
-    SharedPreferences sp;
     public int size = 9;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-//        sp = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
-//        int size = Integer.parseInt(sp.getString("boardSizePref","4"));
         board = new Board(size,1);
         boardView = findViewById(R.id.boardView);
         boardView.setBoard(board);
@@ -84,6 +81,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    //Enable buttons depending in the size of the array
     public void enableButtons(){
         if(size == 4){
             for (int i = 5 ; i < numberIds.length; i++){
@@ -106,11 +104,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-        //Settings menu item
-//        if( id == R.id.action_settings){
-//            Intent i = new Intent(MainActivity.this, AppPreferenceActivity.class);
-//            startActivity(i);
-//        }
+
         //Solve menu item
         if(id == R.id.action_solve){
             AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
@@ -145,6 +139,7 @@ public class MainActivity extends AppCompatActivity {
                 boardView.postInvalidate();
             }
         }
+        //4x4 board size option
         else if(id == R.id.small){
             if(item.isChecked()){
                 item.setChecked(true);
@@ -160,6 +155,7 @@ public class MainActivity extends AppCompatActivity {
                 item.setChecked(false);
             }
         }
+        //9x9 board size option
         else if(id == R.id.large){
             if(item.isChecked()){
                 item.setChecked(true);
@@ -174,37 +170,44 @@ public class MainActivity extends AppCompatActivity {
                 item.setChecked(false);
             }
         }
+        //Easy level option
         else if(id == R.id.easy){
             if(item.isChecked()){
                 item.setChecked(true);
             }else{
                 board = new Board(size, 1);
                 boardView = findViewById(R.id.boardView);
-                boardView.setBoard(board);;
-                boardView.postInvalidate();
+                boardView.setBoard(board);
+                boardView.setSelectedX(-1);
+                boardView.setSelectedY(-1);
                 boardView.postInvalidate();
                 item.setChecked(false);
             }
         }
+        //Medium level option
         else if(id == R.id.medium){
             if(item.isChecked()){
                 item.setChecked(true);
             }else{
                 board = new Board(size, 2);
                 boardView = findViewById(R.id.boardView);
-                boardView.setBoard(board);;
-                boardView.postInvalidate();
+                boardView.setBoard(board);
+                boardView.setSelectedX(-1);
+                boardView.setSelectedY(-1);
                 boardView.postInvalidate();
                 item.setChecked(false);
             }
         }
+        //Hard level option
         else if(id == R.id.hard){
             if(item.isChecked()){
                 item.setChecked(true);
             }else{
                 board = new Board(size, 3);
                 boardView = findViewById(R.id.boardView);
-                boardView.setBoard(board);;
+                boardView.setBoard(board);
+                boardView.setSelectedX(-1);
+                boardView.setSelectedY(-1);
                 boardView.postInvalidate();
                 item.setChecked(false);
             }
@@ -225,8 +228,6 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(DialogInterface dialogInterface, int i) {
                 //Restart Activity
                 recreate();
-//                Intent intent = new Intent(MainActivity.this, Menu.class);
-//                startActivity(intent);
             }
         });
         alertDialogBuilder.setNegativeButton("No", new DialogInterface.OnClickListener() {
@@ -246,25 +247,15 @@ public class MainActivity extends AppCompatActivity {
      *          or 0 for the delete button.
      */
     public void numberClicked(int n) {
-        //Gets selected square's coords and inserts number
+        //Deletes number in square selected
         if(n==0 && board.getSquare(squareX,squareY).getUserValue()!=0){
             board.insertZero(squareX,squareY);
             board.getSquare(squareX,squareY).setDraw(false);
             boardView.postInvalidate();
-        }else if(board.getSquare(squareX,squareY).getUserValue()==0 && n!=0){
+        }
+        //Insert number in square selected
+        else if(board.getSquare(squareX,squareY).getUserValue()==0 && n!=0){
             board.insertNumber(squareX, squareY, n);
-            if(board.inRw&&!board.getSquare(squareX,squareY).getDraw()){
-                toastWarning("Number already in row");
-                board.inRw = false;
-            }
-            else if(board.inSq&&!board.getSquare(squareX,squareY).getDraw()){
-                toastWarning("Number already in 3x3");
-                board.inSq = false;
-            }
-            else if(board.inCol&&!board.getSquare(squareX,squareY).getDraw()){
-                toastWarning("Number already in column");
-                board.inCol = false;
-            }
             //if game is won, display winning message
             if(board.win){
                 boardView.win = true;
@@ -302,6 +293,7 @@ public class MainActivity extends AppCompatActivity {
        //  toast(String.format("Square selected: (%d, %d)", x, y));
     }
 
+    //Disable buttons for numbers that are not permitted for the selected square and for the prefilled values
     public void disableButtons(){
         for(int i = 1 ; i <= board.size; i++){
             View button = findViewById(numberIds[i]);
@@ -320,14 +312,6 @@ public class MainActivity extends AppCompatActivity {
         toast.setGravity(Gravity.TOP,-7,130);
         toast.show();
 
-    }
-
-    private void toastWarning(String msg) {
-        Toast toast = Toast.makeText(this, msg, Toast.LENGTH_SHORT);
-        toast.setGravity(Gravity.TOP,-7,130);
-        View toastView = toast.getView();
-        toastView.setBackgroundColor(Color.parseColor("#ffb380"));
-        toast.show();
     }
 
     @Override
