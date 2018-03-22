@@ -78,7 +78,7 @@ public class BoardView extends View {
     private final Paint blackPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     {
         blackPaint.setColor(Color.BLACK);
-        blackPaint.setStrokeWidth(5);
+        blackPaint.setStrokeWidth(7);
     }
 
     private final Paint preFilledPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
@@ -96,7 +96,7 @@ public class BoardView extends View {
 
     private final Paint squareSelectionPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     {
-        squareSelectionPaint.setColor(Color.GREEN);
+        squareSelectionPaint.setColor(Color.CYAN);
         squareSelectionPaint.setStyle(Paint.Style.STROKE);
         squareSelectionPaint.setStrokeWidth(7);
     }
@@ -252,12 +252,29 @@ public class BoardView extends View {
                     else if(board.getSquare(i,j).getDraw()){
                         canvas.drawText(Integer.toString(board.getSquare(i,j).getUserValue()),(startX + (i+1)*gridSpacing-35)-15,(startY + j*gridSpacing)+55,textPaint);
                     }
+                    else{
+                        Paint numPaint = new Paint();
+                        numPaint.setColor(Color.BLACK);
+                        numPaint.setTextSize(15);
+                        for(int num = 0; num < board.permittedNums(i,j).size(); num++){
+                            canvas.drawText(Integer.toString(board.permittedNums(i,j).get(num)), (startX + (i + 1) * gridSpacing - 35) -(34-(num*9)), (startY + j * gridSpacing) + 68, numPaint);
+                        }
+                    }
                 }
                 //Check if it's one of the prefilled values
                 else if(board.getSquare(i,j).getDraw() && board.getSquare(i,j).getPrefilled()){
                     canvas.drawText(Integer.toString(board.getSquare(i,j).getValue()),(startX + (i+1)*gridSpacing-35)-15,(startY + j*gridSpacing)+55,preFilledPaint);
-                } else if(board.getSquare(i,j).getDraw()){
-                    canvas.drawText(Integer.toString(board.getSquare(i,j).getUserValue()),(startX + (i+1)*gridSpacing-35)-15,(startY + j*gridSpacing)+55,textPaint);
+                }
+                else if(board.getSquare(i,j).getDraw()) {
+                    canvas.drawText(Integer.toString(board.getSquare(i, j).getUserValue()), (startX + (i + 1) * gridSpacing - 35) - 15, (startY + j * gridSpacing) + 55, textPaint);
+
+                } else{
+                    Paint numPaint = new Paint();
+                    numPaint.setColor(Color.BLACK);
+                    numPaint.setTextSize(15);
+                    for(int num = 0; num < board.permittedNums(i,j).size(); num++){
+                        canvas.drawText(Integer.toString(board.permittedNums(i,j).get(num)), (startX + (i + 1) * gridSpacing - 35) -(34-(num*9)), (startY + j * gridSpacing) + 68, numPaint);
+                    }
                 }
             }
         }
@@ -270,7 +287,16 @@ public class BoardView extends View {
         //the difference between board size and the selected x-coordinate
         float diff = maxCoord() /(float)boardSize;
         if(selectedX != -1 && selectedY != -1){
-            canvas.drawRect(selectedX*diff,selectedY*diff,selectedX*diff+diff,selectedY*diff+diff,squareSelectionPaint);
+            System.out.println("Selected X: " + selectedX);
+            System.out.println("Selected Y: " + selectedY);
+
+            if(board.getSquare(selectedX,selectedY).getPrefilled()){
+                squareSelectionPaint.setColor(Color.BLUE);
+                canvas.drawRect(selectedX*diff,selectedY*diff,selectedX*diff+diff,selectedY*diff+diff,squareSelectionPaint);
+            }else {
+                squareSelectionPaint.setColor(Color.CYAN);
+                canvas.drawRect(selectedX * diff, selectedY * diff, selectedX * diff + diff, selectedY * diff + diff, squareSelectionPaint);
+            }
         }
 
     }

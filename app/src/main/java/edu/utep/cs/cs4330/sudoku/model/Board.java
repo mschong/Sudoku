@@ -119,7 +119,7 @@ public class Board {
         return null;
     }
 
-    private boolean isValidNumber(int x, int y, int val) {
+    public boolean isValidNumber(int x, int y, int val) {
 //        if (getSquare(x, y).getValue() != 0) {
 //            return false;
 //        }
@@ -248,27 +248,6 @@ public class Board {
         }
     }
 
-    public  void printUserGrid() {
-        System.out.println("\n+===+===+===+===+===+===+===+===+===+");
-        for (int i = 0; i < size; i++) {
-            System.out.print("|");
-            for (int j = 0; j < size; j++) {
-                if (j % 3 == 2) {
-                    System.out
-                            .print(" " + ((getSquare(j, i).getUserValue() == 0) ? " " : getSquare(j, i).getUserValue()) + " !");
-                } else {
-                    System.out
-                            .print(" " + ((getSquare(j, i).getUserValue() == 0) ? " " : getSquare(j, i).getUserValue()) + " |");
-                }
-            }
-            if (i % 3 == 2) {
-                System.out.println("\n+===+===+===+===+===+===+===+===+===+");
-
-            } else {
-                System.out.println("\n+---+---+---+---+---+---+---+---+---+");
-            }
-        }
-    }
 
     private int getSubgrid(int n) {
         int coord = (int) (Math.floor((n / ((int)Math.sqrt(size))))) * ((int)Math.sqrt(size));
@@ -352,10 +331,9 @@ public class Board {
             getSquare(x, y).setDraw(true);
             isWin();
         }
-        printUserGrid();
-
     }
 
+    //Get random squares to draw
     private void randomDraw(){
         Random rand = new Random();
 
@@ -372,11 +350,27 @@ public class Board {
         }
     }
 
+    //Checking if user value is correct
     public boolean checkNum(int x , int y) {
         if (getSquare(x, y).getUserValue() != getSquare(x, y).getValue() && !getSquare(x, y).getPrefilled()){
             return false;
     }
         return true;
+    }
+
+
+    public ArrayList<Integer> permittedNums(int x, int y){
+        ArrayList<Integer> nums = new ArrayList<>();
+        for(int i = 1; i <= size; i++){
+            if(isValidNumber(x,y,i)&& !getSquare(x,y).getPrefilled()){
+                nums.add(i);
+            }
+        }
+        System.out.println("Permitted numbers:");
+        for(int i: nums){
+            System.out.println(i);
+        }
+        return nums;
     }
 
 

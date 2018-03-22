@@ -93,9 +93,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    
-
-
 
     //create the 3 dots
     @Override
@@ -157,6 +154,8 @@ public class MainActivity extends AppCompatActivity {
                 boardView = findViewById(R.id.boardView);
                 boardView.setBoard(board);
                 enableButtons();
+                boardView.setSelectedX(-1);
+                boardView.setSelectedY(-1);
                 boardView.postInvalidate();
                 item.setChecked(false);
             }
@@ -169,6 +168,8 @@ public class MainActivity extends AppCompatActivity {
                 size = 9;
                 boardView = findViewById(R.id.boardView);
                 boardView.setBoard(board);
+                boardView.setSelectedX(-1);
+                boardView.setSelectedY(-1);
                 boardView.postInvalidate();
                 item.setChecked(false);
             }
@@ -296,8 +297,21 @@ public class MainActivity extends AppCompatActivity {
         boardView.setSelectedY(y);
         //force the screen to redraw upon selection
         boardView.postInvalidate();
+        disableButtons();
+        board.permittedNums(x,y);
+       //  toast(String.format("Square selected: (%d, %d)", x, y));
+    }
 
-        toast(String.format("Square selected: (%d, %d)", x, y));
+    public void disableButtons(){
+        for(int i = 1 ; i <= board.size; i++){
+            View button = findViewById(numberIds[i]);
+            if(!board.isValidNumber(squareX,squareY, i) && !board.getSquare(squareX,squareY).getPrefilled()){
+                button.setEnabled(false);
+            } else if(board.getSquare(squareX,squareY).getPrefilled() || board.getSquare(squareX,squareY).getUserValue()!=0){
+                button.setEnabled(false);
+            } else
+                button.setEnabled(true);
+        }
     }
 
     /** Show a toast message. */
