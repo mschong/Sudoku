@@ -227,31 +227,12 @@ public class BoardView extends View {
         if(board.size==9) {
             for (int i = 0; i < board.size; i++) {
                 for (int j = 0; j < board.size; j++) {
-                    //Checks if check was selected
-                    if (board.check) {
-                        //If the user the number entered is incorrect it would be painted reed
-                        if (!board.checkNum(i, j) && board.getSquare(i, j).getUserValue() != 0) {
-                            wrongPaint.setTextSize(50);
-                            canvas.drawText(Integer.toString(board.getSquare(i, j).getUserValue()), (startX + (i + 1) * gridSpacing - 35) - 15, (startY + j * gridSpacing) + 55, wrongPaint);
-
-                        } else
-                            drawNumbers(canvas, gridSpacing, startX, startY, i, j);
-                    } else
                         drawNumbers(canvas, gridSpacing, startX, startY, i, j);
                 }
             }
         }else if(board.size==4) {
             for (int i = 0; i < board.size; i++) {
                 for (int j = 0; j < board.size; j++) {
-                    //Checks if check was selected
-                    if (board.check) {
-                        //If the user the number entered is incorrect it would be painted reed
-                        if (!board.checkNum(i, j) && board.getSquare(i, j).getUserValue() != 0) {
-                            wrongPaint.setTextSize(105);
-                            canvas.drawText(Integer.toString(board.getSquare(i, j).getUserValue()), (startX + (i + 1) * gridSpacing)-110, (startY + j * gridSpacing)+120, wrongPaint);
-                        } else
-                            drawNumbers(canvas, gridSpacing, startX, startY, i, j);
-                    } else
                         drawNumbers(canvas, gridSpacing, startX, startY, i, j);
                 }
             }
@@ -270,12 +251,12 @@ public class BoardView extends View {
             textPaint.setTextSize(50);
             preFilledPaint.setTextSize(50);
             numPaint.setColor(Color.BLACK);
-            if (board.getSquare(i, j).getDraw() && board.getSquare(i, j).getPrefilled()) {
+            if (board.getSquare(i, j).getPrefilled() && board.getSquare(i,j).getValue()!=0) {
                 canvas.drawText(Integer.toString(board.getSquare(i, j).getValue()), (startX + (i + 1) * gridSpacing - 35) - 15, (startY + j * gridSpacing) + 55, preFilledPaint);
             }
             //Draw user values
-            else if (board.getSquare(i, j).getDraw()) {
-                canvas.drawText(Integer.toString(board.getSquare(i, j).getUserValue()), (startX + (i + 1) * gridSpacing - 35) - 15, (startY + j * gridSpacing) + 55, textPaint);
+            else if (!board.getSquare(i, j).getPrefilled() && board.getSquare(i,j).getValue()!=0) {
+                canvas.drawText(Integer.toString(board.getSquare(i, j).getValue()), (startX + (i + 1) * gridSpacing - 35) - 15, (startY + j * gridSpacing) + 55, textPaint);
             }
             //Draw permitted numbers
             else {
@@ -287,12 +268,12 @@ public class BoardView extends View {
         }else {
             textPaint.setTextSize(105);
             preFilledPaint.setTextSize(105);
-            if (board.getSquare(i, j).getDraw() && board.getSquare(i, j).getPrefilled()) {
+            if (board.getSquare(i, j).getPrefilled()) {
                 canvas.drawText(Integer.toString(board.getSquare(i, j).getValue()), (startX + (i + 1) * gridSpacing)-110, (startY + j * gridSpacing)+120, preFilledPaint);
             }
             //Draw user values
-            else if (board.getSquare(i, j).getDraw()) {
-                canvas.drawText(Integer.toString(board.getSquare(i, j).getUserValue()), (startX + (i + 1) * gridSpacing)-110, (startY + j * gridSpacing)+120, textPaint);
+            else if (!board.getSquare(i, j).getPrefilled() && board.getSquare(i,j).getValue()!=0) {
+                canvas.drawText(Integer.toString(board.getSquare(i, j).getValue()), (startX + (i + 1) * gridSpacing)-110, (startY + j * gridSpacing)+120, textPaint);
             }
             //Draw permitted numbers
             else {

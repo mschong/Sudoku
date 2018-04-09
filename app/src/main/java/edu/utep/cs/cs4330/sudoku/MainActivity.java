@@ -114,7 +114,10 @@ public class MainActivity extends AppCompatActivity {
                 public void onClick(DialogInterface dialogInterface, int i) {
                     SudokuSolver solver = new SudokuSolver(board);
                     solver.solve();
+                    if(!board.solvable)
+                        toast("Board can't be solved.");
                     boardView.postInvalidate();
+
                 }
             });
             alertDialogBuilder.setNegativeButton("No", new DialogInterface.OnClickListener() {
@@ -129,15 +132,13 @@ public class MainActivity extends AppCompatActivity {
         }
         //Check menu item
         else if(id == R.id.action_check){
-            if(board.check) {
-                item.setTitle("Check: Off");
-                board.check = false;
-                boardView.postInvalidate();
-            } else{
-                item.setTitle("Check: On");
-                board.check = true;
-                boardView.postInvalidate();
-            }
+            Board copyBoard = board.copyBoard(new Board(board.size, board.difficulty));
+            SudokuSolver solver = new SudokuSolver(board);
+            solver.solve();
+            if(!copyBoard.solvable)
+                toast("Game is not solvable");
+            else
+                toast("Game is solvable!");
         }
         //4x4 board size option
         else if(id == R.id.small){
@@ -217,6 +218,7 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+
     /** Callback to be invoked when the new button is tapped. */
     public void newClicked(View view) {
 
@@ -227,7 +229,22 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
                 //Restart Activity
-                recreate();
+                //recreate();
+                if(board.size==4){
+                    board = new Board(4,board.difficulty);
+                    boardView = findViewById(R.id.boardView);
+                    boardView.setBoard(board);
+                    boardView.setSelectedX(-1);
+                    boardView.setSelectedY(-1);
+                    boardView.postInvalidate();
+                } else{
+                    board = new Board(9,board.difficulty);
+                    boardView = findViewById(R.id.boardView);
+                    boardView.setBoard(board);
+                    boardView.setSelectedX(-1);
+                    boardView.setSelectedY(-1);
+                    boardView.postInvalidate();
+                }
             }
         });
         alertDialogBuilder.setNegativeButton("No", new DialogInterface.OnClickListener() {
@@ -248,13 +265,12 @@ public class MainActivity extends AppCompatActivity {
      */
     public void numberClicked(int n) {
         //Deletes number in square selected
-        if(n==0 && board.getSquare(squareX,squareY).getUserValue()!=0){
+        if(n==0 && board.getSquare(squareX,squareY).getValue()!=0){
             board.insertZero(squareX,squareY);
-            board.getSquare(squareX,squareY).setDraw(false);
             boardView.postInvalidate();
         }
         //Insert number in square selected
-        else if(board.getSquare(squareX,squareY).getUserValue()==0 && n!=0){
+        else if(board.getSquare(squareX,squareY).getValue()==0 && n!=0){
             board.insertNumber(squareX, squareY, n);
             //if game is won, display winning message
             if(board.win){
@@ -265,10 +281,12 @@ public class MainActivity extends AppCompatActivity {
         }else{
             if(board.getSquare(squareX,squareY).getPrefilled())
                 toast("Can't delete prefilled value");
-            else
+            else {
                 toast("Space is taken.");
+            }
         }
     }
+
 
     /**
      * Callback to be invoked when a square is selected in the board view.
@@ -299,7 +317,7 @@ public class MainActivity extends AppCompatActivity {
             View button = findViewById(numberIds[i]);
             if(!board.isValidNumber(squareX,squareY, i) && !board.getSquare(squareX,squareY).getPrefilled()){
                 button.setEnabled(false);
-            } else if(board.getSquare(squareX,squareY).getPrefilled() || board.getSquare(squareX,squareY).getUserValue()!=0){
+            } else if(board.getSquare(squareX,squareY).getPrefilled() || board.getSquare(squareX,squareY).getValue()!=0){
                 button.setEnabled(false);
             } else
                 button.setEnabled(true);

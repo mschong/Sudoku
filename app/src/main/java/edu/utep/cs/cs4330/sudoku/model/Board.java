@@ -2,7 +2,11 @@ package edu.utep.cs.cs4330.sudoku.model;
 
 
 import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.Queue;
 import java.util.Random;
+import java.util.Stack;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 /** An abstraction of Sudoku puzzle. */
 public class Board {
@@ -11,7 +15,7 @@ public class Board {
     public final int size;
     public  int difficulty; //easy; default
     public ArrayList<Square> grid = new ArrayList<>();
-    public boolean win, check=false;
+    public boolean win, solvable=true;
     public int numberToFill;
 
     /** Create a new board of the given size. */
@@ -85,6 +89,7 @@ public class Board {
             switchColumns();
         }
         transpose();
+        printGrid();
         randomDraw();
     }
 
@@ -92,6 +97,15 @@ public class Board {
         for (int i = 0; i < size; i++) {
             getSquare(i, y).setValue(0);
         }
+    }
+
+    public Board copyBoard(Board newBoard){
+        for (int i = 0; i < size; i++){
+            for (int j = 0 ; j < size; j++){
+                newBoard.getSquare(i,j).setValue(getSquare(i,j).getValue());
+            }
+        }
+        return newBoard;
     }
 
     /**Check if the created game can be won**/
@@ -151,15 +165,9 @@ public class Board {
         int col = (int) (Math.floor((x / boundary))) * boundary;
             for (int i = row; i < row + boundary; i++) {
                 for (int j = col; j < col + boundary; j++) {
-                    if(getSquare(j,i).getPrefilled()) {
                         if (getSquare(j, i).getValue() == n) {
                             return false;
                         }
-                    }else{
-                        if(getSquare(j, i).getUserValue() == n) {
-                            return false;
-                        }
-                    }
                 }
             }
         return true;
@@ -168,15 +176,10 @@ public class Board {
     /**Checks if number is in row**/
     private boolean inColumn(int x, int y, int n) {
         for (int row = 0; row < size; row++) {
-            if(getSquare(x,row).getPrefilled()) {
                 if (getSquare(x, row).getValue() == n) {
                     return false;
                 }
-            }else{
-                if(getSquare(x , row).getUserValue() == n) {
-                    return false;
-                }
-            }
+
         }
         return true;
     }
@@ -184,15 +187,10 @@ public class Board {
     /** Checks if number is in column**/
     private boolean inRow(int x, int y, int n) {
         for (int col = 0; col < size; col++) {
-            if(getSquare(col,y).getPrefilled()) {
                 if (getSquare(col, y).getValue() == n) {
                     return false;
                 }
-            }else{
-                if(getSquare(col, y).getUserValue() == n) {
-                    return false;
-                }
-            }
+
         }
         return true;
     }
@@ -278,36 +276,32 @@ public class Board {
         }
     }
 
+
     /**Inserts zero to delete a number**/
     public void insertZero(int x, int y){
         if(!getSquare(x,y).getPrefilled()) {
-            getSquare(x,y).setDraw(false);
-            getSquare(x,y).insertUserValue(0);
+            getSquare(x,y).setValue(0);
         }
     }
 
     /**Check if the game is won**/
     public void isWin(){
-        for(int i = 0; i < size; i++){
-            for(int j = 0; j < size; j++){
-                if(!getSquare(i,j).getPrefilled() && (getSquare(i,j).getUserValue() != getSquare(i,j).getValue())) {
-                    win = false;
-                    return;
-                }
-            }
-        }
-        win = true;
+        if(isSolvable())
+            win = true;
+        else
+            win = false;
     }
+
 
     /**Insert number in square**/
     public void insertNumber(int x, int y, int n) {
         // check if valid number
-        if (getSquare(x,y).getUserValue()==0 && !getSquare(x, y).getPrefilled() && isValidNumber(x, y, n)) {
-            getSquare(x, y).insertUserValue(n);
-            getSquare(x, y).setDraw(true);
+        if (getSquare(x,y).getValue()==0 && !getSquare(x, y).getPrefilled() && isValidNumber(x, y, n)) {
+            getSquare(x, y).setValue(n);
             isWin();
         }
     }
+
 
     /**Get random squares to draw**/
     private void randomDraw(){
@@ -316,8 +310,8 @@ public class Board {
         for(int i = 0; i < numberToFill; i++){
             int x = rand.nextInt(size);
             int y = rand.nextInt(size);
-            if(getSquare(x, y).getDraw()){
-                getSquare(x, y).setDraw(false);
+            if(getSquare(x, y).getValue()!=0){
+                getSquare(x, y).setValue(0);
                 getSquare(x,y).setPrefilled(false);
             }
             else{
@@ -326,13 +320,15 @@ public class Board {
         }
     }
 
+
     /**Checks if user value is correct**/
-    public boolean checkNum(int x , int y) {
-        if (getSquare(x, y).getUserValue() != getSquare(x, y).getValue() && !getSquare(x, y).getPrefilled()){
-            return false;
-    }
-        return true;
-    }
+//    public boolean checkNum(int x , int y) {
+//        if (getSquare(x, y).getUserValue() != getSquare(x, y).getValue() && !getSquare(x, y).getPrefilled()) {
+//            return false;
+//        }
+//        return true;
+//    }
+
 
 
     /**Gets the permitted numbers per square**/
