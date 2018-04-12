@@ -1,9 +1,13 @@
 package edu.utep.cs.cs4330.sudoku;
 
+import android.app.Dialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -12,14 +16,18 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ListView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import edu.utep.cs.cs4330.sudoku.model.Board;
+import edu.utep.cs.cs4330.sudoku.model.SudokuController;
 
 /**
  * HW1 template for developing an app to play simple Sudoku games.
@@ -42,16 +50,22 @@ import edu.utep.cs.cs4330.sudoku.model.Board;
  * @author Yoonsik Cheon, Marina Chong, Ana Garcia
  */
 public class MainActivity extends AppCompatActivity {
-
+    private SudokuController sudokuController;
     private final static int REQUEST_ENABLE_BT = 1;
     private BluetoothAdapter bluetoothAdapter;
     private BluetoothDevice connectingDevice;
     private ArrayAdapter<String> discoveredDevicesAdapter;
-    //private SudokuController sudokuController;
+    private Dialog dialog;
 
     private Board board;
 
     private BoardView boardView;
+    public static final int MESSAGE_STATE_CHANGE = 1;
+    public static final int MESSAGE_DEVICE_OBJECT = 4;
+    public static final String DEVICE_OBJECT = "device_name";
+    public static final int MESSAGE_TOAST = 5;
+    public static final int MESSAGE_WRITE = 3;
+    public static final int MESSAGE_READ = 2;
 
     /** All the number buttons. */
     private List<View> numberButtons;
@@ -90,22 +104,45 @@ public class MainActivity extends AppCompatActivity {
         //the device doesn't support Bluetooth
         if(bluetoothAdapter == null){
             toast("Bluetooth is not supported!");
+            finish();
         }
 
         //show bluetooth devices dialog when click connect button
         bluetoothButton.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view){
-                if (!bluetoothAdapter.isEnabled()) {
-                    Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-                    startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
-                }
+                showPrinterPickDialog();
             }
         });
 
     }
 
-    /*private void showPrinterPickDialog() {
+    private final BroadcastReceiver discoveryFinishReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+
+            if (BluetoothDevice.ACTION_FOUND.equals(action)) {
+                BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+                if (device.getBondState() != BluetoothDevice.BOND_BONDED) {
+                    discoveredDevicesAdapter.add(device.getName() + "\n" + device.getAddress());
+                }
+            } else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(action)) {
+                if (discoveredDevicesAdapter.getCount() == 0) {
+                    discoveredDevicesAdapter.add("None Found");
+                }
+            }
+        }
+    };
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        // Don't forget to unregister the ACTION_FOUND receiver.
+        unregisterReceiver(discoveryFinishReceiver);
+    }
+
+    private void showPrinterPickDialog() {
         dialog = new Dialog(this);
         dialog.setContentView(R.layout.layout_bluetooth);
         dialog.setTitle("Bluetooth Devices");
@@ -150,11 +187,17 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                System.out.println("listView's onItemClick ");
                 bluetoothAdapter.cancelDiscovery();
-                String info = ((TextView) view).getText().toString();
-                String address = info.substring(info.length() - 17);
-
-                connectToDevice(address);
+                //String info = ((TextView) view).getText().toString();
+                //System.out.println("info is = " + info);
+                //String [] address = info.split(" ");
+                //System.out.println("address[0]: " + address[0]);
+                //System.out.println("address[1]: " + address[1]);
+                //address[1] = address[1].substring(1);
+                System.out.println("address of connecting device:" + connectingDevice.getAddress());
+                System.out.println("About to call connectDevice in listview:");
+                connectToDevice(connectingDevice.getAddress());
                 dialog.dismiss();
             }
 
@@ -163,11 +206,14 @@ public class MainActivity extends AppCompatActivity {
         listView2.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                System.out.println("listView2's onItemClick ");
                 bluetoothAdapter.cancelDiscovery();
-                String info = ((TextView) view).getText().toString();
-                String address = info.substring(info.length() - 17);
-
-                connectToDevice(address);
+                //String info = ((TextView) view).getText().toString();
+                //System.out.println("info is = " + info);
+                //String address = info.substring(info.length() - 17);
+                //System.out.println("About to call connectDevice in listview2:");
+                //connectToDevice(address);
+                //System.out.println("Connect to device succeeded!");
                 dialog.dismiss();
             }
         });
@@ -181,7 +227,7 @@ public class MainActivity extends AppCompatActivity {
         });
         dialog.setCancelable(false);
         dialog.show();
-    }*/
+    }
 
     //Enable buttons depending in the size of the array
     public void enableButtons(){
@@ -193,6 +239,14 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    private void connectToDevice(String deviceAddress) {
+        System.out.println("Entered connectToDevice");
+        bluetoothAdapter.cancelDiscovery();
+        BluetoothDevice device = bluetoothAdapter.getRemoteDevice(deviceAddress);
+        System.out.println("About to connect");
+        sudokuController.connect(device);
+        System.out.println("Successfully connected");
+    }
 
     //create the 3 dots
     @Override
