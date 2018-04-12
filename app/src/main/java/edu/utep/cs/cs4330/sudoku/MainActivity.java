@@ -21,7 +21,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -71,7 +70,6 @@ public class MainActivity extends AppCompatActivity {
 
     private BluetoothAdapter btAdapter;
     private BluetoothDevice device;
-    private NetworkAdapter networkAdapter;
     private BluetoothServerSocket server;
     private BluetoothSocket client;
     private List<BluetoothDevice> listDevices;
@@ -80,7 +78,7 @@ public class MainActivity extends AppCompatActivity {
     private PrintStream logger;
     private OutputStream out;
     public static final UUID MY_UUID = UUID.fromString("6983c9aa-0326-4914-a1a0-0c3da24646e6");
-    private NetworkAdapter na;
+    private NetworkAdapter networkAdapter;
     private NetworkAdapter.MessageListener listener;
 
 
@@ -112,10 +110,33 @@ public class MainActivity extends AppCompatActivity {
             public void messageReceived(NetworkAdapter.MessageType type, int x, int y, int z, int[] others) {
                 switch (type.header){
                     case "join:":
-
+                        ArrayList<Integer> boardInfo = new ArrayList<>();
+                        for(int i = 0 ; i <  board.size; i++){
+                            for(int j = 0 ; j < board.size; j++){
+                                boardInfo.add(i);
+                                boardInfo.add(j);
+                                boardInfo.add(board.getSquare(i,j).getValue());
+                                if(board.getSquare(i,j).getPrefilled())
+                                    boardInfo.add(1);
+                                else
+                                    boardInfo.add(0);
+                            }
+                        }
+                        Integer[] boardValues = new Integer[boardInfo.size()];
+                        boardValues = boardInfo.toArray(boardValues);
+                        for(int i = 0 ; i < boardValues.length-4; i+=4){
+                            networkAdapter.writeJoinAck(boardValues[i],boardValues[i+1],boardValues[i+2],boardValues[i+3]);
+                        }
                         break;
                     case "join_ack:":
-
+                        Board newBoard = new Board(board.size, board.difficulty);
+                        for (int i = 0 ; i < others.length-4; i+=4){
+                            newBoard.getSquare(others[i],others[i+1]).setValue(others[i+2]);
+                            if(others[i+3]==1)
+                                newBoard.getSquare(others[i],others[i+1]).setPrefilled(true);
+                            else
+                                newBoard.getSquare(others[i],others[i+1]).setPrefilled(false);
+                        }
                         break;
                     case "new:":
 
@@ -125,11 +146,16 @@ public class MainActivity extends AppCompatActivity {
                         break;
                     case "fill:":
                         board.getSquare(x,y).setValue(z);
-                        na.writeFillAck(x, y, z);
+                        networkAdapter.writeFillAck(x, y, z);
                         boardView.postInvalidate();
                         break;
                     case "fill_ack:":
-
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    toast("Successful");
+                                }
+                            });
                         break;
                     case "quit:":
 
@@ -174,9 +200,9 @@ public class MainActivity extends AppCompatActivity {
         if (!btAdapter.isEnabled()) {
             Intent turnOn = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
             startActivityForResult(turnOn, 0);
-            Toast.makeText(getApplicationContext(), "Turned on", Toast.LENGTH_LONG).show();
+            toast("Turn on");
         } else {
-            Toast.makeText(getApplicationContext(), "Already on", Toast.LENGTH_LONG).show();
+            toast("Already on.");
             Intent getVisible = new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
             startActivityForResult(getVisible, 0);
             acceptThread();
@@ -187,7 +213,6 @@ public class MainActivity extends AppCompatActivity {
     public void acceptThread() {
         BluetoothServerSocket temp = null;
         try {
-            // MY_UUID is the app's UUID string, also used by the client code.
             temp = btAdapter.listenUsingRfcommWithServiceRecord(NAME, MY_UUID);
         } catch (IOException e) {
             Log.e("Not listening", "Socket's listen() method failed", e);
@@ -199,7 +224,7 @@ public class MainActivity extends AppCompatActivity {
         BluetoothSocket socket = null;
         while (true) {
             try {
-                socket = server.accept(5000);
+                socket = server.accept(50000);
             } catch (IOException e) {
                 Log.e("Not accepting", "Socket's accept() method failed", e);
                 break;
@@ -207,9 +232,9 @@ public class MainActivity extends AppCompatActivity {
 
             if (socket != null) {
                 toast("Connected");
-                na = new NetworkAdapter(socket, logger);
-                na.setMessageListener(listener);
-                na.receiveMessagesAsync();
+                networkAdapter = new NetworkAdapter(socket, logger);
+                networkAdapter.setMessageListener(listener);
+                networkAdapter.receiveMessagesAsync();
                 server.close();
                 break;
             }
@@ -271,9 +296,9 @@ public class MainActivity extends AppCompatActivity {
         if(client == null){
             toast("Null client");
         }else {
-            na = new NetworkAdapter(client, logger);
-            na.setMessageListener(listener);
-            na.receiveMessagesAsync();
+            networkAdapter = new NetworkAdapter(client, logger);
+            networkAdapter.setMessageListener(listener);
+            networkAdapter.receiveMessagesAsync();
         }
     }
 
@@ -281,7 +306,6 @@ public class MainActivity extends AppCompatActivity {
         if (!btAdapter.isEnabled()) {
             getClient();
         }
-        // setup the alert builder
         if(listDevices.isEmpty()){
             Intent turnOn = new Intent(android.provider.Settings.ACTION_BLUETOOTH_SETTINGS);
             startActivityForResult(turnOn, 0);
@@ -319,7 +343,6 @@ public class MainActivity extends AppCompatActivity {
         });
         builder.setNegativeButton("Cancel", null);
 
-        // create and show the alert dialog
         AlertDialog dialog = builder.create();
         dialog.show();
     }

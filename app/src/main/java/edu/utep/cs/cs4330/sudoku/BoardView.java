@@ -155,9 +155,9 @@ public class BoardView extends View {
         blackPaint2.setColor(Color.BLACK);
         blackPaint2.setStrokeWidth(15);
         //Top Line
-        canvas.drawLine(0,0,maxCoord,0, blackPaint2);
+        canvas.drawLine(0,0,maxCoord,0, blackPaint);
         //Bottom Line
-        canvas.drawLine(0,maxCoord,maxCoord,maxCoord, blackPaint2);
+        canvas.drawLine(0,maxCoord,maxCoord,maxCoord, blackPaint);
         //Left Line
         canvas.drawLine(0, maxCoord, 0,0, blackPaint);
         //Right Line
@@ -252,17 +252,19 @@ public class BoardView extends View {
             preFilledPaint.setTextSize(50);
             numPaint.setColor(Color.BLACK);
             if (board.getSquare(i, j).getPrefilled() && board.getSquare(i,j).getValue()!=0) {
-                canvas.drawText(Integer.toString(board.getSquare(i, j).getValue()), (startX + (i + 1) * gridSpacing - 35) - 15, (startY + j * gridSpacing) + 55, preFilledPaint);
+              // canvas.drawText(Integer.toString(board.getSquare(i, j).getValue()), (startX + i * gridSpacing)-20, (startY + j * gridSpacing)+60, preFilledPaint);
+                canvas.drawText(Integer.toString(board.getSquare(i, j).getValue()), squareSize *i+25, squareSize*j+55, preFilledPaint);
             }
             //Draw user values
             else if (!board.getSquare(i, j).getPrefilled() && board.getSquare(i,j).getValue()!=0) {
-                canvas.drawText(Integer.toString(board.getSquare(i, j).getValue()), (startX + (i + 1) * gridSpacing - 35) - 15, (startY + j * gridSpacing) + 55, textPaint);
+                canvas.drawText(Integer.toString(board.getSquare(i, j).getValue()), squareSize *i+25, squareSize*j+55, textPaint);
             }
             //Draw permitted numbers
             else {
                 numPaint.setTextSize(15);
                 for (int num = 0; num < board.permittedNums(i, j).size(); num++) {
-                    canvas.drawText(Integer.toString(board.permittedNums(i, j).get(num)), (startX + (i + 1) * gridSpacing - 35) - (32 - (num * 9)), (startY + j * gridSpacing) + 68, numPaint);
+                    //canvas.drawText(Integer.toString(board.permittedNums(i, j).get(num)), (startX + (i + 1) * gridSpacing - 35) - (32 - (num * 9)), (startY + j * gridSpacing) + 68, numPaint);
+                    canvas.drawText(Integer.toString(board.permittedNums(i, j).get(num)), squareSize *i+40 - (num*9), squareSize*j+70, numPaint);
                 }
             }
         }else {
