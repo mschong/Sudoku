@@ -1,13 +1,10 @@
 package edu.utep.cs.cs4330.sudoku;
 
-import android.content.Context;
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.graphics.Color;
 import android.os.Bundle;
-import android.preference.ListPreference;
-import android.preference.PreferenceManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Gravity;
@@ -15,6 +12,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.Toast;
 
@@ -45,6 +43,12 @@ import edu.utep.cs.cs4330.sudoku.model.Board;
  */
 public class MainActivity extends AppCompatActivity {
 
+    private final static int REQUEST_ENABLE_BT = 1;
+    private BluetoothAdapter bluetoothAdapter;
+    private BluetoothDevice connectingDevice;
+    private ArrayAdapter<String> discoveredDevicesAdapter;
+    //private SudokuController sudokuController;
+
     private Board board;
 
     private BoardView boardView;
@@ -62,11 +66,13 @@ public class MainActivity extends AppCompatActivity {
     private int squareX;
     private int squareY;
     public int size = 9;
+    private Button bluetoothButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        bluetoothButton = findViewById(R.id.bluetoothButton);
         board = new Board(size,1);
         boardView = findViewById(R.id.boardView);
         boardView.setBoard(board);
@@ -79,7 +85,103 @@ public class MainActivity extends AppCompatActivity {
             numberButtons.add(button);
             setButtonWidth(button);
         }
+
+        bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        //the device doesn't support Bluetooth
+        if(bluetoothAdapter == null){
+            toast("Bluetooth is not supported!");
+        }
+
+        //show bluetooth devices dialog when click connect button
+        bluetoothButton.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view){
+                if (!bluetoothAdapter.isEnabled()) {
+                    Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+                    startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
+                }
+            }
+        });
+
     }
+
+    /*private void showPrinterPickDialog() {
+        dialog = new Dialog(this);
+        dialog.setContentView(R.layout.layout_bluetooth);
+        dialog.setTitle("Bluetooth Devices");
+
+        if (bluetoothAdapter.isDiscovering()) {
+            bluetoothAdapter.cancelDiscovery();
+        }
+        bluetoothAdapter.startDiscovery();
+
+        //Initializing bluetooth adapters
+        ArrayAdapter<String> pairedDevicesAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1);
+        discoveredDevicesAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1);
+
+        //locate listviews and attatch the adapters
+        ListView listView = (ListView) dialog.findViewById(R.id.pairedDeviceList);
+        ListView listView2 = (ListView) dialog.findViewById(R.id.discoveredDeviceList);
+        listView.setAdapter(pairedDevicesAdapter);
+        listView2.setAdapter(discoveredDevicesAdapter);
+
+        // Register for broadcasts when a device is discovered
+        IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
+        registerReceiver(discoveryFinishReceiver, filter);
+
+        // Register for broadcasts when discovery has finished
+        filter = new IntentFilter(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
+        registerReceiver(discoveryFinishReceiver, filter);
+
+        bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        Set<BluetoothDevice> pairedDevices = bluetoothAdapter.getBondedDevices();
+
+        // If there are paired devices, add each one to the ArrayAdapter
+        if (pairedDevices.size() > 0) {
+            for (BluetoothDevice device : pairedDevices) {
+                pairedDevicesAdapter.add(device.getName() + "\n" + device.getAddress());
+            }
+        } else {
+            pairedDevicesAdapter.add(getString(R.string.none_paired));
+        }
+
+        //Handling listview item click event
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                bluetoothAdapter.cancelDiscovery();
+                String info = ((TextView) view).getText().toString();
+                String address = info.substring(info.length() - 17);
+
+                connectToDevice(address);
+                dialog.dismiss();
+            }
+
+        });
+
+        listView2.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                bluetoothAdapter.cancelDiscovery();
+                String info = ((TextView) view).getText().toString();
+                String address = info.substring(info.length() - 17);
+
+                connectToDevice(address);
+                dialog.dismiss();
+            }
+        });
+
+        dialog.findViewById(R.id.cancelButton).setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+            }
+        });
+        dialog.setCancelable(false);
+        dialog.show();
+    }*/
 
     //Enable buttons depending in the size of the array
     public void enableButtons(){
