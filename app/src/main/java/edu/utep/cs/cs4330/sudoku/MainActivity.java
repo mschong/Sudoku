@@ -189,7 +189,6 @@ public class MainActivity extends AppCompatActivity {
         try {
             // MY_UUID is the app's UUID string, also used by the client code.
             temp = btAdapter.listenUsingRfcommWithServiceRecord(NAME, MY_UUID);
-            temp.accept(100);
         } catch (IOException e) {
             Log.e("Not listening", "Socket's listen() method failed", e);
         }
@@ -200,7 +199,7 @@ public class MainActivity extends AppCompatActivity {
         BluetoothSocket socket = null;
         while (true) {
             try {
-                socket = server.accept();
+                socket = server.accept(5000);
             } catch (IOException e) {
                 Log.e("Not accepting", "Socket's accept() method failed", e);
                 break;
