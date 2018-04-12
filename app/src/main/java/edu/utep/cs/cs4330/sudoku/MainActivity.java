@@ -1,25 +1,31 @@
 package edu.utep.cs.cs4330.sudoku;
 
-import android.content.Context;
+
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothServerSocket;
+import android.bluetooth.BluetoothSocket;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.graphics.Color;
 import android.os.Bundle;
-import android.preference.ListPreference;
-import android.preference.PreferenceManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.Toast;
-
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.PrintStream;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
+import static android.provider.Settings.NameValueTable.NAME;
 
 import edu.utep.cs.cs4330.sudoku.model.Board;
 
@@ -63,6 +69,21 @@ public class MainActivity extends AppCompatActivity {
     private int squareY;
     public int size = 9;
 
+    private BluetoothAdapter btAdapter;
+    private BluetoothDevice device;
+    private NetworkAdapter networkAdapter;
+    private BluetoothServerSocket server;
+    private BluetoothSocket client;
+    private List<BluetoothDevice> listDevices;
+    private ArrayList<String> nameDevices;
+    private int temp;
+    private PrintStream logger;
+    private OutputStream out;
+    public static final UUID MY_UUID = UUID.fromString("6983c9aa-0326-4914-a1a0-0c3da24646e6");
+    private NetworkAdapter na;
+    private NetworkAdapter.MessageListener listener;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -79,7 +100,235 @@ public class MainActivity extends AppCompatActivity {
             numberButtons.add(button);
             setButtonWidth(button);
         }
+
+        listDevices = new ArrayList<BluetoothDevice>();
+        nameDevices = new ArrayList<String>();
+        device = null;
+        btAdapter = BluetoothAdapter.getDefaultAdapter();
+        out = new ByteArrayOutputStream(1024);
+        logger = new PrintStream(out);
+        listener = new NetworkAdapter.MessageListener() {
+            @Override
+            public void messageReceived(NetworkAdapter.MessageType type, int x, int y, int z, int[] others) {
+                switch (type.header){
+                    case "join:":
+
+                        break;
+                    case "join_ack:":
+
+                        break;
+                    case "new:":
+
+                        break;
+                    case "new_ack:":
+
+                        break;
+                    case "fill:":
+                        board.getSquare(x,y).setValue(z);
+                        na.writeFillAck(x, y, z);
+                        boardView.postInvalidate();
+                        break;
+                    case "fill_ack:":
+
+                        break;
+                    case "quit:":
+
+                        break;
+                }
+            }
+        };
     }
+
+
+    public void on(View v){
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+        alertDialogBuilder.setMessage("Select an option");
+        alertDialogBuilder.setPositiveButton("Server", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                try {
+                    server();
+                } catch (IOException e) {
+                }
+
+            }
+        });
+        alertDialogBuilder.setNegativeButton("Client", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                client();
+            }
+        });
+        alertDialogBuilder.setNeutralButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                dialogInterface.dismiss();
+            }
+        });
+
+        AlertDialog alertDialog = alertDialogBuilder.create();
+        alertDialog.show();
+    }
+
+    public void server() throws IOException {
+        if (!btAdapter.isEnabled()) {
+            Intent turnOn = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+            startActivityForResult(turnOn, 0);
+            Toast.makeText(getApplicationContext(), "Turned on", Toast.LENGTH_LONG).show();
+        } else {
+            Toast.makeText(getApplicationContext(), "Already on", Toast.LENGTH_LONG).show();
+            Intent getVisible = new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
+            startActivityForResult(getVisible, 0);
+            acceptThread();
+            runServer();
+        }
+    }
+
+    public void acceptThread() {
+        BluetoothServerSocket temp = null;
+        try {
+            // MY_UUID is the app's UUID string, also used by the client code.
+            temp = btAdapter.listenUsingRfcommWithServiceRecord(NAME, MY_UUID);
+            temp.accept(100);
+        } catch (IOException e) {
+            Log.e("Not listening", "Socket's listen() method failed", e);
+        }
+        server = temp;
+    }
+
+    public void runServer() throws IOException {
+        BluetoothSocket socket = null;
+        while (true) {
+            try {
+                socket = server.accept();
+            } catch (IOException e) {
+                Log.e("Not accepting", "Socket's accept() method failed", e);
+                break;
+            }
+
+            if (socket != null) {
+                toast("Connected");
+                na = new NetworkAdapter(socket, logger);
+                na.setMessageListener(listener);
+                na.receiveMessagesAsync();
+                server.close();
+                break;
+            }
+            else {
+                toast("Null socket");
+            }
+        }
+    }
+
+    public void getClient(){
+        if (!btAdapter.isEnabled()) {
+            Intent turnOn = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+            startActivityForResult(turnOn, 0);
+            listDevices = new ArrayList<BluetoothDevice>();
+            nameDevices = new ArrayList<String>();
+            for (BluetoothDevice b : btAdapter.getBondedDevices()) {
+                listDevices.add(b);
+                nameDevices.add(b.getName());
+            }
+            Toast.makeText(getApplicationContext(), "Turned on",Toast.LENGTH_LONG).show();
+        } else {
+            Toast.makeText(getApplicationContext(), "Already on", Toast.LENGTH_LONG).show();
+            listDevices = new ArrayList<BluetoothDevice>();
+            nameDevices = new ArrayList<String>();
+            for (BluetoothDevice b : btAdapter.getBondedDevices()) {
+                listDevices.add(b);
+                nameDevices.add(b.getName());
+            }
+        }
+    }
+
+    public void connectToThread(BluetoothDevice peerDevice) {
+        BluetoothSocket tmp = null;
+        device = peerDevice;
+        try {
+            tmp = peerDevice.createRfcommSocketToServiceRecord(MY_UUID);
+        }
+        catch (IOException e) {
+            Log.e("Error", "Socket: " + tmp.toString() + " create() failed", e);
+        }
+
+        client = tmp;
+        Log.d("socket", device.toString());
+    }
+
+    public void runClient() {
+        btAdapter.cancelDiscovery();
+        try {
+            client.connect();
+        } catch (IOException connectException) {
+            try {
+                client.close();
+            } catch (IOException closeException) {
+                Log.e("Close socket", "Could not close the client socket", closeException);
+            }
+            return;
+        }
+        toast("Connected");
+        if(client == null){
+            toast("Null client");
+        }else {
+            na = new NetworkAdapter(client, logger);
+            na.setMessageListener(listener);
+            na.receiveMessagesAsync();
+        }
+    }
+
+    public void client() {
+        if (!btAdapter.isEnabled()) {
+            getClient();
+        }
+        // setup the alert builder
+        if(listDevices.isEmpty()){
+            Intent turnOn = new Intent(android.provider.Settings.ACTION_BLUETOOTH_SETTINGS);
+            startActivityForResult(turnOn, 0);
+            getClient();
+        }
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Paired Devices");
+
+        String[] arrDevices = nameDevices.toArray(new String[nameDevices.size()]);
+        int checkedItem = 0;
+        builder.setSingleChoiceItems(arrDevices, checkedItem, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                toast(arrDevices[which]);
+                temp = which;
+            }
+        });
+
+        builder.setPositiveButton("CONNECT", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                device = listDevices.get(temp);
+                Log.d("devices", device.getAddress());
+                connectToThread(device);
+                runClient();
+            }
+        });
+        builder.setNeutralButton("PAIR", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                Intent turnOn = new Intent(android.provider.Settings.ACTION_BLUETOOTH_SETTINGS);
+                startActivityForResult(turnOn, 0);
+            }
+        });
+        builder.setNegativeButton("Cancel", null);
+
+        // create and show the alert dialog
+        AlertDialog dialog = builder.create();
+        dialog.show();
+    }
+
+
+
+
+
 
     //Enable buttons depending in the size of the array
     public void enableButtons(){
@@ -90,6 +339,7 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
+
 
 
     //create the 3 dots
@@ -365,3 +615,4 @@ public class MainActivity extends AppCompatActivity {
         view.setLayoutParams(params);
     }
 }
+
