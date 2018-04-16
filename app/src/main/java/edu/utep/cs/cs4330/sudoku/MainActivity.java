@@ -122,11 +122,11 @@ public class MainActivity extends AppCompatActivity {
                                     boardInfo.add(0);
                             }
                         }
-                        Integer[] boardValues = new Integer[boardInfo.size()];
-                        boardValues = boardInfo.toArray(boardValues);
-                        for(int i = 0 ; i < boardValues.length-4; i+=4){
-                            networkAdapter.writeJoinAck(boardValues[i],boardValues[i+1],boardValues[i+2],boardValues[i+3]);
+                        int[] b = new int[boardInfo.size()];
+                        for(int i = 0 ; i < b.length; i++){
+                            b[i] = boardInfo.get(i).intValue();
                         }
+                        networkAdapter.writeJoinAck(board.size, b);
                         break;
                     case "join_ack:":
                         Board newBoard = new Board(board.size, board.difficulty);
@@ -137,6 +137,8 @@ public class MainActivity extends AppCompatActivity {
                             else
                                 newBoard.getSquare(others[i],others[i+1]).setPrefilled(false);
                         }
+                        boardView.setBoard(newBoard);
+                        boardView.postInvalidate();
                         break;
                     case "new:":
 
@@ -224,7 +226,7 @@ public class MainActivity extends AppCompatActivity {
         BluetoothSocket socket = null;
         while (true) {
             try {
-                socket = server.accept(50000);
+                socket = server.accept(5000);
             } catch (IOException e) {
                 Log.e("Not accepting", "Socket's accept() method failed", e);
                 break;
