@@ -12,7 +12,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 public class Board {
 
     /** Size of this board (number of columns/rows). */
-    public final int size;
+    public int size;
     public  int difficulty; //easy; default
     public ArrayList<Square> grid = new ArrayList<>();
     public boolean win, solvable=true;
@@ -27,6 +27,11 @@ public class Board {
         fillBoard();
         printGrid();
 
+    }
+
+    public Board(int size){
+        this.size = size;
+        initializeGrid();
     }
 
 

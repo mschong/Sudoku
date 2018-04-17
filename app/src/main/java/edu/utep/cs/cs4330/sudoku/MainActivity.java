@@ -21,6 +21,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -127,10 +128,17 @@ public class MainActivity extends AppCompatActivity {
                             b[i] = boardInfo.get(i).intValue();
                         }
                         networkAdapter.writeJoinAck(board.size, b);
+                        runOnUiThread(new Runnable() {
+                            public void run() {
+                                toast("Successful");
+                            }
+                        });
                         break;
                     case "join_ack:":
-                        Board newBoard = new Board(board.size, board.difficulty);
-                        for (int i = 0 ; i < others.length-4; i+=4){
+                        board.size = y;
+                        Board newBoard = new Board(y);
+                        System.out.println("Others: " + others[1]);
+                        for(int i = 0; i < others.length-4; i+=4){
                             newBoard.getSquare(others[i],others[i+1]).setValue(others[i+2]);
                             if(others[i+3]==1)
                                 newBoard.getSquare(others[i],others[i+1]).setPrefilled(true);
@@ -139,6 +147,11 @@ public class MainActivity extends AppCompatActivity {
                         }
                         boardView.setBoard(newBoard);
                         boardView.postInvalidate();
+                        runOnUiThread(new Runnable() {
+                            public void run() {
+                                toast("Connection successful");
+                            }
+                        });
                         break;
                     case "new:":
 
@@ -150,6 +163,11 @@ public class MainActivity extends AppCompatActivity {
                         board.getSquare(x,y).setValue(z);
                         networkAdapter.writeFillAck(x, y, z);
                         boardView.postInvalidate();
+                        runOnUiThread(new Runnable() {
+                            public void run() {
+                                toast("Value inserted");
+                            }
+                        });
                         break;
                     case "fill_ack:":
                             runOnUiThread(new Runnable() {
@@ -207,41 +225,36 @@ public class MainActivity extends AppCompatActivity {
             toast("Already on.");
             Intent getVisible = new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
             startActivityForResult(getVisible, 0);
-            acceptThread();
-            runServer();
-        }
-    }
-
-    public void acceptThread() {
-        BluetoothServerSocket temp = null;
-        try {
-            temp = btAdapter.listenUsingRfcommWithServiceRecord(NAME, MY_UUID);
-        } catch (IOException e) {
-            Log.e("Not listening", "Socket's listen() method failed", e);
-        }
-        server = temp;
-    }
-
-    public void runServer() throws IOException {
-        BluetoothSocket socket = null;
-        while (true) {
+            /**Run server thread**/
+            BluetoothServerSocket temp = null;
             try {
-                socket = server.accept(5000);
+                temp = btAdapter.listenUsingRfcommWithServiceRecord(NAME, MY_UUID);
             } catch (IOException e) {
-                Log.e("Not accepting", "Socket's accept() method failed", e);
-                break;
+                Log.e("Not listening", "Socket failed", e);
             }
+            server = temp;
 
-            if (socket != null) {
-                toast("Connected");
-                networkAdapter = new NetworkAdapter(socket, logger);
-                networkAdapter.setMessageListener(listener);
-                networkAdapter.receiveMessagesAsync();
-                server.close();
-                break;
-            }
-            else {
-                toast("Null socket");
+            /**Run client**/
+            BluetoothSocket socket = null;
+            while (true) {
+                try {
+                    socket = server.accept(12000);
+                } catch (IOException e) {
+                    Log.e("Not accepting", "Socket failed", e);
+                    break;
+                }
+
+                if (socket != null) {
+                    toast("Connected");
+                    networkAdapter = new NetworkAdapter(socket, logger);
+                    networkAdapter.setMessageListener(listener);
+                    networkAdapter.receiveMessagesAsync();
+                    server.close();
+                    break;
+                }
+                else {
+                    toast("No connection");
+                }
             }
         }
     }
@@ -252,55 +265,19 @@ public class MainActivity extends AppCompatActivity {
             startActivityForResult(turnOn, 0);
             listDevices = new ArrayList<BluetoothDevice>();
             nameDevices = new ArrayList<String>();
-            for (BluetoothDevice b : btAdapter.getBondedDevices()) {
-                listDevices.add(b);
-                nameDevices.add(b.getName());
+            for (BluetoothDevice bt : btAdapter.getBondedDevices()) {
+                listDevices.add(bt);
+                nameDevices.add(bt.getName());
             }
-            Toast.makeText(getApplicationContext(), "Turned on",Toast.LENGTH_LONG).show();
+            toast("Turned on");
         } else {
-            Toast.makeText(getApplicationContext(), "Already on", Toast.LENGTH_LONG).show();
+            toast("Already on");
             listDevices = new ArrayList<BluetoothDevice>();
             nameDevices = new ArrayList<String>();
-            for (BluetoothDevice b : btAdapter.getBondedDevices()) {
-                listDevices.add(b);
-                nameDevices.add(b.getName());
+            for (BluetoothDevice bt : btAdapter.getBondedDevices()) {
+                listDevices.add(bt);
+                nameDevices.add(bt.getName());
             }
-        }
-    }
-
-    public void connectToThread(BluetoothDevice peerDevice) {
-        BluetoothSocket tmp = null;
-        device = peerDevice;
-        try {
-            tmp = peerDevice.createRfcommSocketToServiceRecord(MY_UUID);
-        }
-        catch (IOException e) {
-            Log.e("Error", "Socket: " + tmp.toString() + " create() failed", e);
-        }
-
-        client = tmp;
-        Log.d("socket", device.toString());
-    }
-
-    public void runClient() {
-        btAdapter.cancelDiscovery();
-        try {
-            client.connect();
-        } catch (IOException connectException) {
-            try {
-                client.close();
-            } catch (IOException closeException) {
-                Log.e("Close socket", "Could not close the client socket", closeException);
-            }
-            return;
-        }
-        toast("Connected");
-        if(client == null){
-            toast("Null client");
-        }else {
-            networkAdapter = new NetworkAdapter(client, logger);
-            networkAdapter.setMessageListener(listener);
-            networkAdapter.receiveMessagesAsync();
         }
     }
 
@@ -308,22 +285,18 @@ public class MainActivity extends AppCompatActivity {
         if (!btAdapter.isEnabled()) {
             getClient();
         }
-        if(listDevices.isEmpty()){
-            Intent turnOn = new Intent(android.provider.Settings.ACTION_BLUETOOTH_SETTINGS);
-            startActivityForResult(turnOn, 0);
-            getClient();
-        }
+        getClient();
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Paired Devices");
 
-        String[] arrDevices = nameDevices.toArray(new String[nameDevices.size()]);
+        String[] devices = nameDevices.toArray(new String[nameDevices.size()]);
         int checkedItem = 0;
-        builder.setSingleChoiceItems(arrDevices, checkedItem, new DialogInterface.OnClickListener() {
+        builder.setSingleChoiceItems(devices, checkedItem, new DialogInterface.OnClickListener() {
             @Override
-            public void onClick(DialogInterface dialog, int which) {
-                toast(arrDevices[which]);
-                temp = which;
+            public void onClick(DialogInterface dialog, int num) {
+                toast(devices[num]);
+                temp = num;
             }
         });
 
@@ -332,25 +305,54 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(DialogInterface dialog, int which) {
                 device = listDevices.get(temp);
                 Log.d("devices", device.getAddress());
-                connectToThread(device);
-                runClient();
+
+                /**Connect to thread**/
+                BluetoothSocket tmp = null;
+                 try {
+                 tmp = device.createRfcommSocketToServiceRecord(MY_UUID);
+                 }
+                catch (IOException e) {
+                    Log.e("Error", "Socket failed", e);
+                 }
+                 client = tmp;
+                Log.d("socket", device.toString());
+
+
+                /**Run client**/
+                btAdapter.cancelDiscovery();
+                try {
+                    client.connect();
+                } catch (IOException connectException) {
+                    try {
+                        client.close();
+                    } catch (IOException closeException) {
+                        Log.e("Close socket", "Can't close", closeException);
+                    }
+                    return;
+                }
+                toast("Connected");
+                if(client == null){
+                    toast("Null client");
+                }else {
+                    networkAdapter = new NetworkAdapter(client, logger);
+                    networkAdapter.setMessageListener(listener);
+                    networkAdapter.receiveMessagesAsync();
+                    networkAdapter.writeJoin();
+                }
             }
         });
-        builder.setNeutralButton("PAIR", new DialogInterface.OnClickListener() {
+        builder.setNegativeButton("PAIR", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 Intent turnOn = new Intent(android.provider.Settings.ACTION_BLUETOOTH_SETTINGS);
                 startActivityForResult(turnOn, 0);
             }
         });
-        builder.setNegativeButton("Cancel", null);
+        builder.setNeutralButton("Cancel", null);
 
         AlertDialog dialog = builder.create();
         dialog.show();
     }
-
-
-
 
 
 
