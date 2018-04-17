@@ -21,7 +21,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -137,7 +136,6 @@ public class MainActivity extends AppCompatActivity {
                     case "join_ack:":
                         board.size = y;
                         Board newBoard = new Board(y);
-                        System.out.println("Others: " + others[1]);
                         for(int i = 0; i < others.length-4; i+=4){
                             newBoard.getSquare(others[i],others[i+1]).setValue(others[i+2]);
                             if(others[i+3]==1)
@@ -145,7 +143,8 @@ public class MainActivity extends AppCompatActivity {
                             else
                                 newBoard.getSquare(others[i],others[i+1]).setPrefilled(false);
                         }
-                        boardView.setBoard(newBoard);
+                        board = newBoard;
+                        boardView.setBoard(board);
                         boardView.postInvalidate();
                         runOnUiThread(new Runnable() {
                             public void run() {
@@ -165,17 +164,16 @@ public class MainActivity extends AppCompatActivity {
                         boardView.postInvalidate();
                         runOnUiThread(new Runnable() {
                             public void run() {
-                                toast("Value inserted");
+                                toast("Value " + z +" inserted");
                             }
                         });
                         break;
                     case "fill_ack:":
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    toast("Successful");
-                                }
-                            });
+                        runOnUiThread(new Runnable() {
+                            public void run() {
+                                toast("Insertion successful");
+                            }
+                        });
                         break;
                     case "quit:":
 
@@ -353,6 +351,7 @@ public class MainActivity extends AppCompatActivity {
         AlertDialog dialog = builder.create();
         dialog.show();
     }
+
 
 
 
@@ -543,6 +542,7 @@ public class MainActivity extends AppCompatActivity {
         //Deletes number in square selected
         if(n==0 && board.getSquare(squareX,squareY).getValue()!=0){
             board.insertZero(squareX,squareY);
+            networkAdapter.writeFill(squareX,squareY,n);
             boardView.postInvalidate();
         }
         //Insert number in square selected
@@ -553,6 +553,7 @@ public class MainActivity extends AppCompatActivity {
                 boardView.win = true;
                 toast("YOU WIN!");
             }
+            networkAdapter.writeFill(squareX,squareY,n);
             boardView.postInvalidate();
         }else{
             if(board.getSquare(squareX,squareY).getPrefilled())
@@ -607,6 +608,20 @@ public class MainActivity extends AppCompatActivity {
         toast.show();
 
     }
+    private void resetConnection() {
+
+        if (out != null) {
+            try {out.close();} catch (Exception e) {}
+            out = null;
+        }
+
+        if (client != null) {
+            try {client.close();} catch (Exception e) {}
+            client = null;
+        }
+
+
+    }
 
     @Override
     public void onBackPressed() {
@@ -615,6 +630,7 @@ public class MainActivity extends AppCompatActivity {
         alertDialogBuilder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
+                resetConnection();
                 MainActivity.this.finish();
             }
         });
